@@ -1,23 +1,29 @@
 <?php
-$pageName = "Home";
-include "header.php";
-?>
-<div class="well">
-	<form method="POST" action="convert.php">
-		<h1>Convert your video</h1>
-			<div class="control-group">
-				<div class="controls">
-					<input name="url" type="text" placeholder="Example: https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="form-control">
-				</div>
-			</div>
-			
-			<div class="control-group">
-				<div class="controls">
-					<input type="submit" class="btn btn-primary btn-block" value="Convert">
-				</div>
-			</div>
-	</form>
-</div>
-<?php
-include "footer.php";
-?>
+
+require_once("../vendor/autoload.php");
+
+// Initialize framework
+$f3 = \Base::instance();
+$f3->set("siteName", "youtube2mp3");
+
+// Route home page
+$f3->route("GET /",
+	function ($f3) {
+		$f3->set("pageType", "main");
+		
+		$template = new Template;
+		echo $template->render("../views/base.tpl");
+	}
+);
+
+// Route convert page
+$f3->route("GET /convert",
+	function ($f3) {
+		$f3->set("pageType", "convert");
+		
+		$template = new Template;
+		echo $template->render("../views/base.tpl");
+	}
+);
+
+$f3->run();

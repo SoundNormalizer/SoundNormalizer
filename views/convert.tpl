@@ -1,7 +1,3 @@
-<?php
-$pageName = "Convert";
-include "header.php";
-?>
 <div class="well">
 	<div class="center">
 		<h1>Converting...</h1>
@@ -11,6 +7,3 @@ include "header.php";
 		</div>
 	</div>
 </div>
-<?php
-include "footer.php";
-?>

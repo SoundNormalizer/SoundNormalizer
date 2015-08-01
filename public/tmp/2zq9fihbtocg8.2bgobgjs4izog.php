@@ -1,9 +1,7 @@
-<?php
-require "../settings.php";
-?><!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 	<head>
-		<title><?php echo $pageName . " | " . $siteName; ?></title>
+		<title><?php echo $pageName; ?> | <?php echo $siteName; ?></title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="shortcut icon" href="favicon.ico">
 		<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
@@ -30,6 +28,14 @@ require "../settings.php";
 			</div>
 		</div>
 	</div>
-
-
 	<div class="container">
+		<?php echo $this->render('../views/' . $pageType . '.tpl',$this->mime,get_defined_vars()); ?>
+	</div>
+	<footer>
+		<div class="container">
+			<p class="text-muted">&copy; 2015 <?php echo $siteName; ?></p>
+		</div>
+	</footer>
+	
+	</body>
+</html>
