@@ -1,5 +1,5 @@
 <?php
-require "settings.php";
+require "../settings.php";
 ?><!DOCTYPE html>
 <html>
 	<head>
