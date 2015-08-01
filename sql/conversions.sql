@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 01, 2015 at 08:13 PM
+-- Generation Time: Aug 01, 2015 at 09:50 PM
 -- Server version: 5.6.21
 -- PHP Version: 5.6.3
 
@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS `conversions` (
   `URL` text NOT NULL,
   `Queued` tinyint(1) NOT NULL,
   `Completed` tinyint(1) NOT NULL,
+  `StatusCode` int(11) NOT NULL,
   `File` text,
   `IP` text NOT NULL,
   `Time` bigint(20) NOT NULL
