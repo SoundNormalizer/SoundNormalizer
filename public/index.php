@@ -1,6 +1,8 @@
 <?php
 require_once("../vendor/autoload.php");
 
+F3::set("DB", new \DB\SQL("mysql:host=" . apache_getenv("DB_HOST") . ";dbname=" . apache_getenv("DB_NAME") . ";charset=utf8", apache_getenv("DB_USER"), apache_getenv("DB_PASS")));
+
 // Initialize framework
 $f3 = \Base::instance();
 $f3->set("siteName", "youtube2mp3");
