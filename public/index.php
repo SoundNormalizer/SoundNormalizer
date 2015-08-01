@@ -18,7 +18,7 @@ $f3->route("GET /",
 );
 
 // Route convert page
-$f3->route("GET /convert",
+$f3->route("POST /convert",
 	function ($f3) {
 		$f3->set("pageName", "Convert");
 		$f3->set("pageType", "convert");

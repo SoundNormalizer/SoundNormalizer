@@ -1,5 +1,5 @@
 <div class="well">
-	<form method="POST" action="convert.php">
+	<form method="POST" action="convert">
 		<h1>Convert your video</h1>
 			<div class="control-group">
 				<div class="controls">
