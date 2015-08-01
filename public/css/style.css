@@ -40,3 +40,10 @@ footer
 	margin-top: 35px;
 	margin-bottom: 0px;
 }
+
+#errorImage
+{
+	width: 100%;
+	max-width: 200px;
+	margin-bottom: -30px;
+}

@@ -1,5 +1,4 @@
 <?php
-
 require_once("../vendor/autoload.php");
 
 // Initialize framework
@@ -28,4 +27,16 @@ $f3->route("POST /convert",
 	}
 );
 
+// Route errors
+$f3->set("ONERROR",
+	function($f3) {
+		$f3->set("pageName", "Error");
+		$f3->set("pageType", "error");
+		
+		$template = new Template;
+		echo $template->render("../views/base.tpl");
+	}
+);
+
 $f3->run();
+?>
