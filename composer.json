@@ -12,7 +12,6 @@
 		}
 	],
 	"require": {
-		"bcosca/fatfree": "3.*",
-		"php-ffmpeg/php-ffmpeg": "0.6.0"
+		"bcosca/fatfree": "3.*"
 	}
 }
