@@ -40,7 +40,10 @@ foreach ($unqueuedArr as $unqueued) {
 		$statusCode = 4;
 	}
 	
-	$updateStatus = $db->prepare("UPDATE `conversions` SET `StatusCode`=:code, `Completed`=TRUE");
-	$updateStatus->execute(array(":code" => $statusCode));
+	$updateStatus = $db->prepare("UPDATE `conversions` SET `StatusCode`=:code, `Completed`=TRUE WHERE `ID`=:id");
+	$updateStatus->execute(array(	
+		":code" => $statusCode,
+		":id" => $reqID
+	));
 }
 ?>

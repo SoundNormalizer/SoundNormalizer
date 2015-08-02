@@ -33,7 +33,8 @@ CREATE TABLE IF NOT EXISTS `conversions` (
   `Completed` tinyint(1) NOT NULL,
   `StatusCode` int(11) NOT NULL,
   `IP` text NOT NULL,
-  `Time` bigint(20) NOT NULL
+  `Time` bigint(20) NOT NULL,
+  `Deleted` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
