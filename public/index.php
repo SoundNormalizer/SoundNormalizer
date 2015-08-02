@@ -13,8 +13,7 @@ $f3->route("GET /",
 		$f3->set("pageName", "Home");
 		$f3->set("pageType", "main");
 		
-		$template = new Template;
-		echo $template->render("../views/base.tpl");
+		echo Template::instance()->render("../views/base.tpl");
 	}
 );
 
@@ -24,8 +23,46 @@ $f3->route("POST /convert",
 		$f3->set("pageName", "Convert");
 		$f3->set("pageType", "convert");
 		
-		$template = new Template;
-		echo $template->render("../views/base.tpl");
+		if (isset($_COOKIE["token"])) {
+			$cookie_query = $f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE `Cookie` = :Cookie AND `Completed` = '0'");
+			$cookie_query->bindValue(":Cookie", $_COOKIE["token"]);
+			$cookie_query->execute();
+			
+			if ($cookie_query->rowCount() > 0) {
+				$f3->error("Please wait for your current video to finish converting.");
+			}
+		}
+		
+		$url_parts = parse_url($_POST["url"]);
+		parse_str($url_parts["query"], $query_parts);
+		
+		
+		if (strpos($url_parts["host"], "youtube.com") !== false) {
+			if (isset($query_parts["v"])) {
+				$token = bin2hex(mcrypt_create_iv(20, MCRYPT_DEV_URANDOM));
+				
+				try {
+					$insert_query = $f3->get("DB")->prepare("INSERT INTO `conversions` (`VideoID`, `Cookie`, `IP`, `TimeAdded`) VALUES (:VideoID, :Cookie, :IP, :TimeAdded)");
+					
+					$insert_query->bindValue(":VideoID", $query_parts["v"]);
+					$insert_query->bindValue(":Cookie", $token);
+					$insert_query->bindValue(":IP", (empty($_SERVER['HTTP_CLIENT_IP'])?(empty($_SERVER['HTTP_X_FORWARDED_FOR'])?$_SERVER['REMOTE_ADDR']:$_SERVER['HTTP_X_FORWARDED_FOR']):$_SERVER['HTTP_CLIENT_IP']));
+					$insert_query->bindValue(":TimeAdded", time());
+					
+					$insert_query->execute();
+					
+					setcookie("token", $token);
+					
+					echo Template::instance()->render("../views/base.tpl");
+				} catch (PDOException $exception) { 
+					$f3->error("Database error!");
+				}
+			} else {
+				$f3->error("Invalid URL entered!");
+			}
+		} else {
+			$f3->error("Invalid URL entered!");
+		}
 	}
 );
 
@@ -35,8 +72,7 @@ $f3->set("ONERROR",
 		$f3->set("pageName", "Error");
 		$f3->set("pageType", "error");
 		
-		$template = new Template;
-		echo $template->render("../views/base.tpl");
+		echo Template::instance()->render("../views/base.tpl");
 	}
 );
 

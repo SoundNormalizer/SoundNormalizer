@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.2.11
+-- version 4.0.9
 -- http://www.phpmyadmin.net
 --
--- Host: 127.0.0.1
--- Generation Time: Aug 02, 2015 at 12:46 AM
--- Server version: 5.6.21
--- PHP Version: 5.6.3
+-- Host: localhost
+-- Generation Time: Aug 02, 2015 at 06:57 AM
+-- Server version: 5.6.14
+-- PHP Version: 5.5.6
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -17,7 +17,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8 */;
 
 --
--- Database: `youtubetomp3`
+-- Database: `youtube2mp3`
 --
 
 -- --------------------------------------------------------
@@ -27,35 +27,20 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE IF NOT EXISTS `conversions` (
-`ID` int(11) NOT NULL,
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
   `VideoID` text NOT NULL,
-  `Queued` tinyint(1) NOT NULL,
-  `Completed` tinyint(1) NOT NULL,
-  `StatusCode` int(11) NOT NULL,
+  `Started` tinyint(1) NOT NULL DEFAULT '0',
+  `Completed` tinyint(1) NOT NULL DEFAULT '0',
+  `StatusCode` int(11) DEFAULT NULL,
+  `Cookie` text NOT NULL,
   `IP` text NOT NULL,
-  `Time` bigint(20) NOT NULL,
-  `Deleted` tinyint(1) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `TimeAdded` bigint(20) NOT NULL,
+  `TimeStarted` bigint(20) DEFAULT NULL,
+  `TimeCompleted` bigint(20) DEFAULT NULL,
+  `Deleted` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `conversions`
---
-ALTER TABLE `conversions`
- ADD PRIMARY KEY (`ID`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `conversions`
---
-ALTER TABLE `conversions`
-MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
