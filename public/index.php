@@ -1,10 +1,11 @@
 <?php
 require_once("../vendor/autoload.php");
+require "../settings.php";
 
 // Initialize framework
 $f3 = \Base::instance();
 $f3->set("siteName", "youtube2mp3");
-$f3->set("DB", new \DB\SQL("mysql:host=" . apache_getenv("DB_HOST") . ";dbname=" . apache_getenv("DB_NAME") . ";charset=utf8", apache_getenv("DB_USER"), apache_getenv("DB_PASS")));
+$f3->set("DB", new \DB\SQL("mysql:host=" . $dbHost . ";dbname=" . $dbName . ";charset=utf8", $dbUser, $dbPass));
 
 // Route home page
 $f3->route("GET /",
