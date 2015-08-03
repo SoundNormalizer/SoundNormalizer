@@ -20,7 +20,7 @@ $(document).ready(function() {
 					break;
 					
 				case "conversion_completed":
-					switch (data.status_code) {
+					switch (parseInt(data.status_code)) {
 						case 3:
 							$("#status").text("Conversion complete");
 							
@@ -42,6 +42,7 @@ $(document).ready(function() {
 							break;
 						
 						default:
+							displayError("Conversion failed: Unknown status");
 							break;
 					}
 					
