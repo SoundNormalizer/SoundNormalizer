@@ -100,29 +100,27 @@ $f3->route("GET /status",
 // Route download path
 $f3->route("GET /download",
 	function ($f3) {
-		if (in_array("mod_xsendfile", apache_get_modules())) {
-			$conversion_query = $f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE (`IP` = :IP AND `Completed` = '1' AND `StatusCode` = '3' AND `Deleted` = '0') ORDER BY `ID` DESC LIMIT 1");
-			$conversion_query->bindValue(":IP", $_SERVER["REMOTE_ADDR"]);
-			$conversion_query->execute();
+		$conversion_query = $f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE (`IP` = :IP AND `Completed` = '1' AND `StatusCode` = '3' AND `Deleted` = '0') ORDER BY `ID` DESC LIMIT 1");
+		$conversion_query->bindValue(":IP", $_SERVER["REMOTE_ADDR"]);
+		$conversion_query->execute();
+		
+		if ($conversion_query->rowCount() > 0) {
+			$conversion = $conversion_query->fetch(PDO::FETCH_ASSOC);
 			
-			if ($conversion_query->rowCount() > 0) {
-				$conversion = $conversion_query->fetch(PDO::FETCH_ASSOC);
+			$output_dir = realpath(dirname(__FILE__) . "/../converted/");
+			$output_file = $output_dir . "/" . preg_replace('((^\.)|\/|(\.$))', '', $conversion["VideoID"]) . ".mp3";
+			
+			if (file_exists($output_file)) {
+				header("X-Sendfile: $output_file");
+				header("Content-type: audio/mpeg");
+				header('Content-Disposition: attachment; filename="' . basename($output_file) . '"');
 				
-				$output_dir = realpath(dirname(__FILE__) . "/../converted/");
-				$output_file = $output_dir . "/" . preg_replace('((^\.)|\/|(\.$))', '', $conversion["VideoID"]) . ".mp3";
-				
-				if (file_exists($output_file)) {
-					header("X-Sendfile: $output_file");
-					header("Content-type: audio/mpeg");
-					header('Content-Disposition: attachment; filename="' . basename($output_file) . '"');
-				} else {
-					$f3->error("No download found.");
-				}
+				die();
 			} else {
 				$f3->error("No download found.");
 			}
 		} else {
-			$f3->error("Sendfile module isn't installed.");
+			$f3->error("No download found.");
 		}
 	}
 );
