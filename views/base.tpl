@@ -6,8 +6,12 @@
 		<link rel="shortcut icon" href="favicon.ico">
 		<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
 		<link href="css/style.css" rel="stylesheet">
-		
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+		<check if="{{ @pageType == 'convert' }}">
+			<true>
+				<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+				<script src="js/status_checker.js"></script>
+			</true>
+		</check>
 		
 		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
 		<!--[if lt IE 9]>
