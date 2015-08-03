@@ -1,9 +1,11 @@
+var checkInterval;
+
 $(document).ready(function() {
 	$(document).on("click", "#dlBtn", function() {
 		window.location.href = "download";
 	});
 	
-	setInterval(function() {
+	checkInterval = setInterval(function() {
 		$.ajax({
 			url: "status",
 			dataType: "json"
@@ -20,26 +22,35 @@ $(document).ready(function() {
 				case "conversion_completed":
 					switch (data.status_code) {
 						case 3:
+							$("#status").text("Conversion complete");
+							
 							var btnHtml = '<button type="submit" class="btn btn-primary btn-block" id="dlBtn"><span class="glyphicon glyphicon-download-alt"></span> &nbsp; Download Converted MP3</button>';
 							$(".progress").before(btnHtml);
 							$(".progress").remove();
 							break;
 							
 						case 1:
+							displayError("Conversion failed: The video doesn't exist");
 							break;
 							
 						case 2:
+							displayError("Conversion failed: Couldn't load the video");
 							break;
 							
 						case 4:
+							displayError("Conversion failed: Unknown error");
 							break;
 						
 						default:
 							break;
 					}
+					
+					clearInterval(checkInterval);
 					break;
 					
 				case "no_conversion_found":
+					displayError("You have no conversions queued");
+					clearInterval(checkInterval);
 					break;
 					
 				default:
@@ -50,5 +61,5 @@ $(document).ready(function() {
 });
 
 function displayError(errMsg) {
-	
+	$(".center").html('<h1>' + errMsg + '</h1><img id="errorImage" src="./img/error.png">');
 }

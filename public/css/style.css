@@ -35,7 +35,7 @@ footer
 	text-align: center;
 }
 
-.progress
+.progress, #dlBtn
 {
 	margin-top: 35px;
 	margin-bottom: 0px;
