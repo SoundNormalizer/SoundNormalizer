@@ -21,7 +21,7 @@ foreach ($unqueuedArr as $unqueued) {
 	$updateQueue = $db->prepare("UPDATE `conversions` SET `Started`=TRUE, `TimeStarted`=UNIX_TIMESTAMP() WHERE `ID`=:id");
 	$updateQueue->execute(array(":id" => $reqID));
 	
-	$cmd = shell_exec($ytdlBin . " --extract-audio --prefer-ffmpeg --ffmpeg-location " . $ffmpegDir . " --audio-quality 128K --audio-format mp3 -o \"" . $outputDir . "/%(id)s.%(ext)s\" -- " . escapeshellarg($reqVideoID));
+	$cmd = shell_exec($ytdlBin . " --extract-audio --prefer-ffmpeg --ffmpeg-location " . $ffmpegDir . " --audio-quality 128K --audio-format mp3 -o \"" . $outputDir . "/%(id)s.%(ext)s\" --sleep-interval 1 -- " . escapeshellarg($reqVideoID));
 	if (strpos($cmd, "YouTube said: This video does not exist") !== false) {
 		// Video is non-existent
 		$statusCode = 1;
