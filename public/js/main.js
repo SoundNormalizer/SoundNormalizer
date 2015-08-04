@@ -10,6 +10,14 @@ $(document).ready(function() {
 	
 	$("#switchToUpload").click(toggleForm);
 	$("#switchToYt").click(toggleForm);
+	
+	$("#selectFile").click(function() {
+		$("#file").click();
+	});
+	
+	$("#file").change(function() {
+		$("#fileName").val($(this).val().match(/[^\/\\]+$/));
+	});
 });
 
 function toggleForm() {
@@ -17,4 +25,6 @@ function toggleForm() {
 	$("#switchToUpload").toggle();
 	$("#uploadForm").toggle();
 	$("#switchToYt").toggle();
+	$("#ytHead").toggle();
+	$("#uploadHead").toggle();
 }
