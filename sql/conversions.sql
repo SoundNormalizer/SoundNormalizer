@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.0.9
+-- version 4.0.10deb1
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Aug 02, 2015 at 06:57 AM
--- Server version: 5.6.14
--- PHP Version: 5.5.6
+-- Generation Time: Aug 04, 2015 at 01:43 AM
+-- Server version: 5.5.44-0ubuntu0.14.04.1
+-- PHP Version: 5.6.11-1+deb.sury.org~trusty+1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `conversions` (
   `Started` tinyint(1) NOT NULL DEFAULT '0',
   `Completed` tinyint(1) NOT NULL DEFAULT '0',
   `StatusCode` int(11) DEFAULT NULL,
-  `Cookie` text NOT NULL,
+  `Normalized` tinyint(1) NOT NULL,
   `IP` text NOT NULL,
   `TimeAdded` bigint(20) NOT NULL,
   `TimeStarted` bigint(20) DEFAULT NULL,

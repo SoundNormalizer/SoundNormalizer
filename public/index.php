@@ -23,6 +23,8 @@ $f3->route("POST /convert",
 		$f3->set("pageName", "Convert");
 		$f3->set("pageType", "convert");
 		
+		$normalize = (isset($_POST["normalize"]) ? 1 : 0);
+		
 		$ip_query = $f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE (`IP` = :IP AND `Completed` = '0')");
 		$ip_query->bindValue(":IP", $_SERVER["REMOTE_ADDR"]);
 		$ip_query->execute();
@@ -36,9 +38,10 @@ $f3->route("POST /convert",
 			if (strpos($url_parts["host"], "youtube.com") !== false) {
 				if (isset($query_parts["v"])) {
 					try {
-						$insert_query = $f3->get("DB")->prepare("INSERT INTO `conversions` (`VideoID`, `IP`, `TimeAdded`) VALUES (:VideoID, :IP, :TimeAdded)");
+						$insert_query = $f3->get("DB")->prepare("INSERT INTO `conversions` (`VideoID`, `Normalized`, `IP`, `TimeAdded`) VALUES (:VideoID, :Normalized, :IP, :TimeAdded)");
 						
 						$insert_query->bindValue(":VideoID", $query_parts["v"]);
+						$insert_query->bindValue(":Normalized", $normalize);
 						$insert_query->bindValue(":IP", $_SERVER["REMOTE_ADDR"]);
 						$insert_query->bindValue(":TimeAdded", time());
 						
