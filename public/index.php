@@ -39,7 +39,7 @@ $f3->route("POST /convert",
 					$normalize = (isset($_POST["normalize"]) ? 1 : 0);
 					
 					// check if the file has been converted recently
-					$duplicate_check_query = $f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE (`VideoID` = :VideoID AND `Normalized` = :Normalized AND `Completed` = '1' AND `StatusCode` = '3' AND `Deleted` = '0')");
+					$duplicate_check_query = $f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE (`VideoID` = :VideoID AND `Normalized` = :Normalized AND `Completed` = '1' AND `StatusCode` = '3' AND `Deleted` = '0' AND `TimeCompleted` IS NOT NULL)");
 					$duplicate_check_query->bindValue(":VideoID", $video_id);
 					$duplicate_check_query->bindValue(":Normalized", $normalize);
 					$duplicate_check_query->execute();
