@@ -5,7 +5,7 @@ require dirname(__FILE__) . "/../settings.php";
 $outputDir = realpath(dirname(__FILE__) . "/../converted/");
 $db = new PDO("mysql:host=" . $dbHost . ";dbname=" . $dbName . ";charset=utf8", $dbUser, $dbPass);
 
-$queueQuery = $db->prepare("SELECT `ID`,`VideoID` FROM `conversions` WHERE `Deleted`=FALSE AND (`Time` + 28800) < UNIX_TIMESTAMP()");
+$queueQuery = $db->prepare("SELECT `ID`,`VideoID` FROM `conversions` WHERE `Deleted`=FALSE AND `TimeCompleted` IS NOT NULL AND (`Time` + 28800) < UNIX_TIMESTAMP()");
 $queueQuery->execute();
 $toDeleteArr = $queueQuery->fetchAll();
 
