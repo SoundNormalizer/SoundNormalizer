@@ -23,8 +23,6 @@ $f3->route("POST /convert",
 		$f3->set("pageName", "Convert");
 		$f3->set("pageType", "convert");
 		
-		$normalize = (isset($_POST["normalize"]) ? 1 : 0);
-		
 		$ip_query = $f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE (`IP` = :IP AND `Completed` = '0')");
 		$ip_query->bindValue(":IP", $_SERVER["REMOTE_ADDR"]);
 		$ip_query->execute();
@@ -37,19 +35,34 @@ $f3->route("POST /convert",
 			
 			if (strpos($url_parts["host"], "youtube.com") !== false) {
 				if (isset($query_parts["v"])) {
-					try {
-						$insert_query = $f3->get("DB")->prepare("INSERT INTO `conversions` (`VideoID`, `Normalized`, `IP`, `TimeAdded`) VALUES (:VideoID, :Normalized, :IP, :TimeAdded)");
-						
-						$insert_query->bindValue(":VideoID", $query_parts["v"]);
-						$insert_query->bindValue(":Normalized", $normalize);
-						$insert_query->bindValue(":IP", $_SERVER["REMOTE_ADDR"]);
-						$insert_query->bindValue(":TimeAdded", time());
-						
-						$insert_query->execute();
-						
-						echo Template::instance()->render("../views/base.tpl");
-					} catch (PDOException $exception) { 
-						$f3->error("Database error!");
+					$video_id = $query_parts["v"];
+					$normalize = (isset($_POST["normalize"]) ? 1 : 0);
+					
+					// check if the file has been converted recently
+					$duplicate_check_query = $f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE (`VideoID` = :VideoID AND `Normalized` = :Normalized AND `Completed` = '1' AND `StatusCode` = '3' AND `Deleted` = '0')");
+					$duplicate_check_query->bindValue(":VideoID", $video_id);
+					$duplicate_check_query->bindValue(":Normalized", $normalize);
+					$duplicate_check_query->execute();
+					
+					if ($duplicate_check_query->rowCount() > 0) {
+						// redirect to download existing file
+						$f3->reroute("@download");
+					} else {
+						// proceed with conversion
+						try {
+							$insert_query = $f3->get("DB")->prepare("INSERT INTO `conversions` (`VideoID`, `Normalized`, `IP`, `TimeAdded`) VALUES (:VideoID, :Normalized, :IP, :TimeAdded)");
+							
+							$insert_query->bindValue(":VideoID", $video_id);
+							$insert_query->bindValue(":Normalized", $normalize);
+							$insert_query->bindValue(":IP", $_SERVER["REMOTE_ADDR"]);
+							$insert_query->bindValue(":TimeAdded", time());
+							
+							$insert_query->execute();
+							
+							echo Template::instance()->render("../views/base.tpl");
+						} catch (PDOException $exception) { 
+							$f3->error("Database error!");
+						}
 					}
 				} else {
 					$f3->error("Invalid URL entered!");
@@ -101,7 +114,7 @@ $f3->route("GET /status",
 );
 
 // Route download path
-$f3->route("GET /download",
+$f3->route("GET @download: /download",
 	function ($f3) {
 		$conversion_query = $f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE (`IP` = :IP AND `Completed` = '1' AND `StatusCode` = '3' AND `Deleted` = '0') ORDER BY `ID` DESC LIMIT 1");
 		$conversion_query->bindValue(":IP", $_SERVER["REMOTE_ADDR"]);
