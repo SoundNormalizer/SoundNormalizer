@@ -6,7 +6,7 @@
 			<div class="input-group">
 				<input name="url" type="text" placeholder="example: https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="form-control input-lg youtube-url">
 				<span class="input-group-btn">
-					<button type="button" class="btn btn-primary btn-lg convert-button">Convert &amp; Normalize</button>
+					<input type="submit" class="btn btn-primary btn-lg convert-button" value="Convert &amp; Normalize">
 				</span>
 			</div>
 		</form>
