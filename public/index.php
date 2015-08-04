@@ -45,6 +45,19 @@ $f3->route("POST /convert",
 					$duplicate_check_query->execute();
 					
 					if ($duplicate_check_query->rowCount() > 0) {
+						try {
+							$insert_query = $f3->get("DB")->prepare("INSERT INTO `conversions` (`VideoID`, `Started`, `Completed`, `StatusCode`, `Normalized`, `IP`, `TimeAdded`) VALUES (:VideoID, TRUE, TRUE, '3', :Normalized, :IP, :TimeAdded)");
+							
+							$insert_query->bindValue(":VideoID", $video_id);
+							$insert_query->bindValue(":Normalized", $normalize);
+							$insert_query->bindValue(":IP", $_SERVER["REMOTE_ADDR"]);
+							$insert_query->bindValue(":TimeAdded", time());
+							
+							$insert_query->execute();
+						} catch (PDOException $exception) { 
+							$f3->error("Database error!");
+						}
+						
 						// redirect to download existing file
 						$f3->reroute("@download");
 					} else {
@@ -125,17 +138,41 @@ $f3->route("GET @download: /download",
 			
 			$output_dir = realpath(dirname(__FILE__) . "/../converted/");
 			$output_file = $output_dir . "/" . preg_replace('((^\.)|\/|(\.$))', '', $conversion["VideoID"]) . ".mp3";
-			
-			if (file_exists($output_file)) {
-				header("X-Sendfile: $output_file");
-				header("Content-type: audio/mpeg");
-				header('Content-Disposition: attachment; filename="' . basename($output_file) . '"');
 				
-				die();
-			} else {
-				$f3->error("No download found.");
+			if (!empty($conversion["TimeCompleted"])) {
+				if (file_exists($output_file)) {
+					header("X-Sendfile: $output_file");
+					header("Content-type: audio/mpeg");
+					header('Content-Disposition: attachment; filename="' . basename($output_file) . '"');
+					
+					die();
+				} else {
+					$f3->error("No download found.");
+				}
 			}
-		} else {
+			else {
+				$duplicate_query = $f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE (`VideoID`=:videoID AND `TimeCompleted` IS NOT NULL AND `Completed` = '1' AND `StatusCode` = '3' AND `Deleted` = '0' AND `Normalized`=:normal) ORDER BY `ID` DESC LIMIT 1");
+				$duplicate_query->bindValue(":videoID", $conversion["VideoID"]);
+				$duplicate_query->bindValue(":normal", $conversion["Normalized"]);
+				$duplicate_query->execute();
+				
+				$get_duplicates = $duplicate_query->fetchAll();
+				if (count($get_duplicates) > 0) {
+					if (file_exists($output_file)) {
+						header("X-Sendfile: $output_file");
+						header("Content-type: audio/mpeg");
+						header('Content-Disposition: attachment; filename="' . basename($output_file) . '"');
+						
+						die();
+					} else {
+						$f3->error("No download found.");
+					}
+				}
+				else {
+					$f3->error("No download found.");
+				}
+			}
+		} else {			
 			$f3->error("No download found.");
 		}
 	}
