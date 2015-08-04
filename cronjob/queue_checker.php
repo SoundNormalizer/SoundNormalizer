@@ -1,6 +1,7 @@
 <?php
 // Start: Settings
 $ytdlBin = "/usr/local/bin/youtube-dl";
+$mp3gainBin = "/usr/bin/mp3gain";
 $ffmpegDir = "/usr/bin";
 // End: Settings
 
@@ -10,13 +11,14 @@ require dirname(__FILE__) . "/../settings.php";
 $outputDir = realpath(dirname(__FILE__) . "/../converted/");
 $db = new PDO("mysql:host=" . $dbHost . ";dbname=" . $dbName . ";charset=utf8", $dbUser, $dbPass);
 
-$queueQuery = $db->prepare("SELECT `ID`,`VideoID` FROM `conversions` WHERE `Started`=FALSE");
+$queueQuery = $db->prepare("SELECT `ID`,`VideoID`,`Normalized` FROM `conversions` WHERE `Started`=FALSE");
 $queueQuery->execute();
 $unqueuedArr = $queueQuery->fetchAll();
 
 foreach ($unqueuedArr as $unqueued) {
 	$reqID = $unqueued["ID"];
 	$reqVideoID = $unqueued["VideoID"];
+	$reqNormalize = $unqueued["Normalized"];
 	
 	$updateQueue = $db->prepare("UPDATE `conversions` SET `Started`=TRUE, `TimeStarted`=UNIX_TIMESTAMP() WHERE `ID`=:id");
 	$updateQueue->execute(array(":id" => $reqID));
@@ -31,8 +33,13 @@ foreach ($unqueuedArr as $unqueued) {
 		$statusCode = 2;
 	}
 	elseif (strpos($cmd, "Deleting original file") !== false) {
-		// Success
+		// Success, now check if we should normalize it
 		$statusCode = 3;
+		
+		if ($reqNormalize) {
+			$outputFile = $outputDir . "/" . preg_replace('((^\.)|\/|(\.$))', '', $reqVideoID);
+			$normalizeCmd = shell_exec($mp3gainBin . " " . escapeshellarg($outputFile));
+		}
 	}
 	else {
 		// Unknown Error
