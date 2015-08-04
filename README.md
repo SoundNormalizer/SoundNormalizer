@@ -44,13 +44,19 @@ dos2unix cronjob/queue_helper.sh
 ```
 
 
-x-sendfile
+mod_xsendfile
 ----------
 
 ```
 sudo apt-get install libapache2-mod-xsendfile
 ```
 
+After installing, add this to the ```<Directory>``` in your vhost:
+
+```
+XSendFile on
+XSendFilePath "/path/to/youtube2mp3/converted"
+```
 
 crontab
 ----------
