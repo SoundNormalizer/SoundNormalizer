@@ -1,18 +1,12 @@
-<div class="well">
-	<div class="center">
 		<form method="POST" action="convert">
-			<h1>Convert your video</h1>
-				<div class="control-group">
-					<div class="controls">
-						<input name="url" type="text" placeholder="Example: https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="form-control">
-					</div>
-				</div>
-				
-				<div class="control-group">
-					<div class="controls">
-						<input type="submit" class="btn btn-primary btn-block" value="Convert">
-					</div>
-				</div>
+			<h1 class="instructions">
+				<i class="glyphicon glyphicon-cloud-download download-icon"></i>
+				<span class="instruction-text"><strong>Paste YouTube URL</strong> into the text field and submit to <strong>normalize video(s)</strong></span>
+			</h1>
+			<div class="input-group">
+				<input name="url" type="text" placeholder="example: https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="form-control input-lg youtube-url">
+				<span class="input-group-btn">
+					<button type="button" class="btn btn-primary btn-lg convert-button">Convert &amp; Normalize</button>
+				</span>
+			</div>
 		</form>
-	</div>
-</div>

@@ -33,7 +33,11 @@
 		</div>
 	</div>
 	<div class="container">
-		<include href="{{ '../views/' . @pageType . '.tpl' }}" />
+		<div class="col-md-8 col-md-offset-2 well">
+			<div class="center">
+				<include href="{{ '../views/' . @pageType . '.tpl' }}" />
+			</div>
+		</div>
 	</div>
 	<footer>
 		<div class="container">
