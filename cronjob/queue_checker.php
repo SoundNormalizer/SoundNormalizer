@@ -1,7 +1,7 @@
 <?php
 // Start: Settings
-$ytdlBin = "C:\\xampp\htdocs\youtube2mp3\cronjob\bin\youtube-dl.exe";
-$ffmpegDir = "C:\\xampp\htdocs\youtube2mp3\cronjob\bin\\";
+$ytdlBin = "/usr/local/bin/youtube-dl";
+$ffmpegDir = "/usr/bin";
 // End: Settings
 
 set_time_limit(0);
