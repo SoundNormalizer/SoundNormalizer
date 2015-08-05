@@ -15,7 +15,7 @@
 						<ul id="settings-dropdown" class="dropdown-menu">
 							<li id="normalize-option"><a href="#" class="small" tabIndex="-1"><input id="normalize-checkbox" type="checkbox" name="normalize-checkbox" checked><span>Normalize</span></a></li>
 						</ul>
-						<input type="submit" class="btn btn-primary btn-lg input-btn" id="youtube-submit" value="Normalize">
+						<input type="submit" class="btn btn-primary btn-lg input-btn" id="youtube-submit" value="Convert & Normalize">
 					</span>
 				</div>
 			</form>

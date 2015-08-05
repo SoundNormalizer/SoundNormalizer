@@ -26,9 +26,9 @@ $(document).ready(function() {
     // register handler to change button text when normalize setting is changed
     $("[name=normalize-checkbox]").change(function() {
 		if ($(this).is(":checked")) {
-			$("#youtube-submit").val("Normalize");
-		} else {
 			$("#youtube-submit").val("Convert & Normalize");
+		} else {
+			$("#youtube-submit").val("Convert");
 		}
 	});
 });
