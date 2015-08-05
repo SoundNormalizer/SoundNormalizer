@@ -93,6 +93,31 @@ $f3->route("POST /convert",
 	}
 );
 
+// Route upload to normalize page
+$f3->route("POST /normalize",
+	function($f3) {
+		if (isset($_FILES["file"]) && !empty($_FILES["file"])) {
+			$tmpName = $_FILES["file"]["tmp_name"];
+			
+			$finfo = finfo_open(FILEINFO_MIME_TYPE);
+			$mimeType = finfo_file($finfo, $tmpName);
+			
+			if ($_FILES["file"]["error"] != UPLOAD_ERR_OK) {
+				$f3->error("Your file was not properly uploaded.");				
+			}
+			elseif ($mimeType != "audio/mpeg") {
+				$f3->error("Only MP3 files can be normalized.");
+			}
+			else {
+				// do stuff.
+			}
+		}
+		else {
+			$f3->error("No file was uploaded!");
+		}
+	}
+);
+
 // Route status path
 $f3->route("GET /status",
 	function ($f3) {

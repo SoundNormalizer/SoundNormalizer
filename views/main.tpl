@@ -39,7 +39,7 @@
 			</form>
 		</div>
 		<div id="upload-form">
-			<form method="POST" action="normalize">
+			<form method="POST" action="normalize" enctype="multipart/form-data">
 				<div class="input-group">
 					<input id="file" type="file" name="file" accept=".mp3">
 					<span class="input-group-btn">
