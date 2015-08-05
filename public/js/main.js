@@ -1,3 +1,5 @@
+var selectedForm = "#youtube-form";
+
 $(document).ready(function() {
 	// register handlers to switch forms
 	$("#upload-switch").click(toggleForm);
@@ -26,9 +28,9 @@ $(document).ready(function() {
 	// register handler to change button text when normalize setting is changed
 	$("[name=normalize-checkbox]").change(function() {
 		if ($(this).is(":checked")) {
-			$("#youtube-submit").val("Convert & Normalize");
+			$("#youtube-submit").text("Convert & Normalize");
 		} else {
-			$("#youtube-submit").val("Convert");
+			$("#youtube-submit").text("Convert");
 		}
 	});
 });
@@ -41,4 +43,20 @@ function toggleForm() {
 	$("#upload-switch").toggle();
 	$("#youtube-instructions").toggle();
 	$("#upload-instructions").toggle();
+	
+	if ($("#captcha-upload").html().trim() == "") {
+		$("#captcha-modal").appendTo("#captcha-upload");
+		selectedForm = "#upload-form";
+	}
+	else {
+		$("#captcha-modal").appendTo("#captcha-youtube");
+		selectedForm = "#youtube-form";
+	}
+}
+
+function captchaSuccess() {
+	// 1 second delay so the green checkmark animation completes and user sees it
+	setTimeout(function() {
+		$(selectedForm + " form").submit();
+	}, 1000);
 }

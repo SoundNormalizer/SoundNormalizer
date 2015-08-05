@@ -119,6 +119,12 @@ footer
 	margin-bottom: -5px;
 }
 
+.g-recaptcha div
+{
+	margin-left: auto;
+	margin-right: auto;
+}
+
 @media (max-width: 992px)
 {
 	.instruction-text

@@ -7,11 +7,16 @@ $f3 = \Base::instance();
 $f3->set("siteName", "youtube2mp3");
 $f3->set("DB", new \DB\SQL("mysql:host=" . $dbHost . ";dbname=" . $dbName . ";charset=utf8", $dbUser, $dbPass));
 
+// Recaptcha info
+$f3->set("recaptchaSiteKey", $recaptchaSiteKey);
+$f3->set("recaptchaSecret", $recaptchaSecret);
+$f3->set("recaptchaLang", $recaptchaLang);
+
 // Route home page
 $f3->route("GET /",
 	function ($f3) {
 		$f3->set("pageName", "Home");
-		$f3->set("pageType", "main");
+		$f3->set("pageType", "main");		
 		
 		echo Template::instance()->render("../views/base.tpl");
 	}

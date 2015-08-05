@@ -15,7 +15,25 @@
 						<ul id="settings-dropdown" class="dropdown-menu">
 							<li id="normalize-option"><a href="#" class="small" tabIndex="-1"><input id="normalize-checkbox" type="checkbox" name="normalize-checkbox" checked><span>Normalize</span></a></li>
 						</ul>
-						<input type="submit" class="btn btn-primary btn-lg input-btn" id="youtube-submit" value="Convert & Normalize">
+						<button type="button" class="btn btn-primary btn-lg input-btn" id="youtube-submit" data-toggle="modal" data-target="#captcha-modal">Convert & Normalize</button>
+						
+						<div id="captcha-youtube">
+							<div id="captcha-modal" class="modal fade">
+								<div class="modal-dialog">
+									<div class="modal-content">
+										<div class="modal-header">
+											<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+											<h4 class="modal-title">Just one more step...</h4>
+										</div>
+										<div class="modal-body">
+											<div class="g-recaptcha" data-callback="captchaSuccess" data-sitekey="{{ @recaptchaSiteKey }}"></div>
+												<script type="text/javascript" src="https://www.google.com/recaptcha/api.js?hl={{ @recaptchaLang }}">
+											</script>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
 					</span>
 				</div>
 			</form>
@@ -32,11 +50,13 @@
 					</span>
 					<input id="file-name" type="text" class="form-control input-lg input-text" readonly="readonly">
 					<span id="upload-button" class="input-group-btn">
-						<input type="submit" class="btn btn-primary btn-lg input-btn" value="Normalize">
+						<button type="button" class="btn btn-primary btn-lg input-btn" data-toggle="modal" data-target="#captcha-modal">Normalize</button>
 					</span>
+					
+					<div id="captcha-upload"></div>
 				</div>
 			</form>
-		</div>
+		</div>		
 		<div id="switchForm">
 			<a href="#" id="upload-switch">Or, upload an mp3 file to normalize...</a>
 			<a href="#" id="youtube-switch">Or, convert and normalize a YouTube video...</a>

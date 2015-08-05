@@ -4,4 +4,8 @@ $dbHost = "";
 $dbName = "";
 $dbUser = "";
 $dbPass = "";
+
+$recaptchaSiteKey = "";
+$recaptchaSecret = "";
+$recaptchaLang = "en";
 ?>
