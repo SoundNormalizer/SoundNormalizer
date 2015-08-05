@@ -1,6 +1,6 @@
 		<h1 id="instructions">
 			<i class="glyphicon glyphicon-cloud-download download-icon"></i>
-			<span class="instruction-text" id="youtube-instructions"><strong>Paste YouTube URL</strong> into the text field and submit to <strong>normalize video(s)</strong></span>
+			<span class="instruction-text" id="youtube-instructions"><strong>Paste YouTube URL</strong> into the text field and submit to <strong>download normalized MP3(s)</strong></span>
 			<span class="instruction-text" id="upload-instructions"><strong>Browse for a file</strong> to upload and submit to <strong>normalize audio track(s)</strong></span>
 		</h1>
 		<div id="youtube-form">
@@ -15,7 +15,7 @@
 						<ul id="settings-dropdown" class="dropdown-menu">
 							<li id="normalize-option"><a href="#" class="small" tabIndex="-1"><input id="normalize-checkbox" type="checkbox" name="normalize-checkbox" checked><span>Normalize</span></a></li>
 						</ul>
-						<button type="button" class="btn btn-primary btn-lg input-btn" id="youtube-submit" data-toggle="modal" data-target="#captcha-modal">Convert & Normalize</button>
+						<button type="button" class="btn btn-primary btn-lg input-btn" id="youtube-submit" data-toggle="modal" data-target="#captcha-modal">Download</button>
 						
 						<div id="captcha-youtube">
 							<div id="captcha-modal" class="modal fade">
@@ -56,8 +56,8 @@
 					<div id="captcha-upload"></div>
 				</div>
 			</form>
-		</div>		
+		</div>
 		<div id="switchForm">
-			<a href="#" id="upload-switch">Or, upload an mp3 file to normalize...</a>
+			<a href="#" id="upload-switch">Or, upload an MP3 file to normalize...</a>
 			<a href="#" id="youtube-switch">Or, convert and normalize a YouTube video...</a>
 		</div>

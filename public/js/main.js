@@ -24,15 +24,6 @@ $(document).ready(function() {
 		
 		return false;
 	});
-	
-	// register handler to change button text when normalize setting is changed
-	$("[name=normalize-checkbox]").change(function() {
-		if ($(this).is(":checked")) {
-			$("#youtube-submit").text("Convert & Normalize");
-		} else {
-			$("#youtube-submit").text("Convert");
-		}
-	});
 });
 
 function toggleForm() {

@@ -16,7 +16,7 @@ $f3->set("recaptchaLang", $recaptchaLang);
 $f3->route("GET /",
 	function ($f3) {
 		$f3->set("pageName", "Home");
-		$f3->set("pageType", "main");		
+		$f3->set("pageType", "main");
 		
 		echo Template::instance()->render("../views/base.tpl");
 	}
