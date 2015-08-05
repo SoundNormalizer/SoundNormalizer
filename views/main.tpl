@@ -23,7 +23,7 @@
 		<div id="upload-form">
 			<form method="POST" action="normalize">
 				<div class="input-group">
-					<input id="file" type="file" name="file">
+					<input id="file" type="file" name="file" accept=".mp3">
 					<span class="input-group-btn">
 						<button type="button" class="btn btn-info btn-lg input-btn" id="browse-button">
 							<span class="glyphicon glyphicon-folder-open"></span>
