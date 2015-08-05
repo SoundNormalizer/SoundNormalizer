@@ -15,21 +15,21 @@ h1
 	margin-top: 0px;
 }
 
-.instructions
-{
-	text-align: left;
-	margin-top: 10px;
-	margin-bottom: 30px;
-}
-
 .download-icon
 {
 	float: left;     
 	font-size: 2em;
 	line-height: 1;
+	margin-left: 15px;
 	margin-right: 25px;
 	text-shadow: 0 0 5px #3E3E3E;
-	margin-left: 15px;
+}
+
+#instructions
+{
+	text-align: left;
+	margin-top: 10px;
+	margin-bottom: 30px;
 }
 
 .instruction-text
@@ -37,7 +37,30 @@ h1
 	font-size: 35px;
 }
 
-.convert-button
+#settings-dropdown
+{
+	background-color: #fff;
+	border-color: #ccc;
+}
+
+#settings-dropdown li a
+{
+	color: #333;
+	outline: none;
+	font-size: 14px;
+}
+
+#settings-dropdown li a:hover
+{
+	color: #ebebeb;
+}
+
+#normalize-option span
+{
+	margin-left: 10px;	
+}
+
+.input-btn
 {
 	padding-bottom: 13px;
 }
@@ -85,7 +108,7 @@ footer
 	background-color: white;
 }
 
-#uploadForm, #switchToYt, #file, #uploadHead
+#upload-form, #youtube-switch, #file, #upload-instructions
 {
 	display: none;
 }
@@ -113,15 +136,59 @@ footer
 
 @media (max-width: 768px)
 {
-	.youtube-url, .convert-button, .input-group-btn, .input-group
+	.input-text, .input-btn, .input-group-btn, .input-group
 	{
 		display: block !important;
 		width: 100%;
 	}
 	
-	.convert-button
+	.input-btn
 	{
 		margin-left: 0px !important;
+	}
+	
+	#upload-button
+	{
+		clear: both;
+	}
+	
+	#file-name
+	{
+		width: -moz-calc(100% - 73px) !important;
+		width: -webkit-calc(100% - 73px) !important;
+		width: calc(100% - 73px) !important;
+	}
+	
+	#youtube-url
+	{
+		width: -moz-calc(100% - 69px) !important;
+		width: -webkit-calc(100% - 69px) !important;
+		width: calc(100% - 69px) !important;
+	}
+	
+	#settings-button, #browse-button
+	{
+		display: inline !important;
+		width: auto;
+	}
+	
+	#settings-dropdown
+	{
+		right: 0;
+		left: auto;
+		float: right;
+		margin-top: -140px;
+	}
+	
+	#browse-button
+	{
+		float: left;
+		
+	}
+	
+	#browse-text
+	{
+		font-size: 0;
 	}
 	
 	.download-icon
