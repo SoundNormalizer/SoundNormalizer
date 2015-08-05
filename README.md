@@ -67,3 +67,20 @@ crontab -e
 0 * * * * /usr/bin/php /vagrant/sites/youtube2mp3/cronjob/delete_checker.php
 * * * * * /bin/sh /vagrant/sites/youtube2mp3/cronjob/queue_helper.sh
 ```
+
+mp3gain
+--------
+
+```
+sudo apt-get install mp3gain
+```
+
+php.ini
+--------
+
+/etc/php5/apache2/php.ini
+
+```
+upload_max_filesize = 100M
+post_max_size = 100M
+```
