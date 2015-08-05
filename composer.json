@@ -12,6 +12,7 @@
 		}
 	],
 	"require": {
-		"bcosca/fatfree": "3.*"
+		"bcosca/fatfree": "3.*",
+		"google/recaptcha": "~1.1"
 	}
 }
