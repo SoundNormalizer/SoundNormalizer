@@ -18,13 +18,13 @@ $(document).ready(function() {
 		if($(event.target).is("input")) return;
 		
 		var checkBoxes = $("[name=normalize-checkbox]");
-        checkBoxes.prop("checked", !checkBoxes.prop("checked")).triggerHandler("change");
-        
-        return false;
-    });
-    
-    // register handler to change button text when normalize setting is changed
-    $("[name=normalize-checkbox]").change(function() {
+		checkBoxes.prop("checked", !checkBoxes.prop("checked")).triggerHandler("change");
+		
+		return false;
+	});
+	
+	// register handler to change button text when normalize setting is changed
+	$("[name=normalize-checkbox]").change(function() {
 		if ($(this).is(":checked")) {
 			$("#youtube-submit").val("Convert & Normalize");
 		} else {
