@@ -36,7 +36,7 @@ $f3->route("POST /convert",
 			if (strpos($url_parts["host"], "youtube.com") !== false) {
 				if (isset($query_parts["v"])) {
 					$video_id = $query_parts["v"];
-					$normalize = (isset($_POST["normalize"]) ? 1 : 0);
+					$normalize = (isset($_POST["normalize-checkbox"]) ? 1 : 0);
 					
 					// check if the file has been converted recently
 					$duplicate_check_query = $f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE (`VideoID` = :VideoID AND `Normalized` = :Normalized AND `Completed` = '1' AND `StatusCode` = '3' AND `Deleted` = '0' AND `TimeCompleted` IS NOT NULL)");
