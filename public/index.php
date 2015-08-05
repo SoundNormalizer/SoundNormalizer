@@ -28,6 +28,13 @@ $f3->route("POST /convert",
 		$f3->set("pageName", "Convert");
 		$f3->set("pageType", "convert");
 		
+		$recaptcha = new \ReCaptcha\ReCaptcha($f3->get("recaptchaSecret"));
+		$recapResp = $recaptcha->verify($_POST["g-recaptcha-response"], $_SERVER["REMOTE_ADDR"]);
+		
+		if (!$recapResp->isSuccess()) {
+			$f3->error("Invalid captcha!");
+		}
+		
 		$ip_query = $f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE (`IP` = :IP AND `Completed` = '0')");
 		$ip_query->bindValue(":IP", $_SERVER["REMOTE_ADDR"]);
 		$ip_query->execute();
