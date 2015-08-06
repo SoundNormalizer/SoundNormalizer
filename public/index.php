@@ -96,24 +96,59 @@ $f3->route("POST /convert",
 // Route upload to normalize page
 $f3->route("POST /normalize",
 	function($f3) {
+		$f3->set("pageName", "Normalize");
+		$f3->set("pageType", "normalize");
+		
+		// Recaptcha not working with multipart/form-data set on form, but it needs to be set or file upload won't work.
+		// Need to look for work around later
+		/*$recaptcha = new \ReCaptcha\ReCaptcha($f3->get("recaptchaSecret"));
+		$recapResp = $recaptcha->verify($_POST["g-recaptcha-response"], $_SERVER["REMOTE_ADDR"]);
+		
+		if (!$recapResp->isSuccess()) {
+			$f3->error("Invalid captcha!");
+		}*/
+		
 		if (isset($_FILES["file"]) && !empty($_FILES["file"])) {
 			$tmpName = $_FILES["file"]["tmp_name"];
+			$fileError = $_FILES["file"]["error"];
 			
-			$finfo = finfo_open(FILEINFO_MIME_TYPE);
-			$mimeType = finfo_file($finfo, $tmpName);
+			if ($fileError === UPLOAD_ERR_OK) {
+				$finfo = finfo_open(FILEINFO_MIME_TYPE);
+				$mimeType = finfo_file($finfo, $tmpName);
 			
-			if ($_FILES["file"]["error"] != UPLOAD_ERR_OK) {
-				$f3->error("Your file was not properly uploaded.");				
+				if ($mimeType != "audio/mpeg") {
+					$f3->error("Only MP3 files can be normalized.");
+				}
+				else {
+					echo "i plan to do stuff here.";
+				}				
 			}
-			elseif ($mimeType != "audio/mpeg") {
-				$f3->error("Only MP3 files can be normalized.");
+			elseif ($fileError === UPLOAD_ERR_NO_FILE) {
+				$f3->error("No file was uploaded!");
 			}
 			else {
-				// do stuff.
+				$f3->error("Your file was not properly uploaded.");
 			}
 		}
 		else {
-			$f3->error("No file was uploaded!");
+			// ini config value to bytes adapted from http://php.net/manual/en/function.ini-get.php
+			$maxFileSize = trim(ini_get("post_max_size"));
+			$sizeUnit = strtolower(substr($maxFileSize, -1));
+			switch($sizeUnit) {
+				case "g":
+					$maxFileSize *= 1024;
+				case "m":
+					$maxFileSize *= 1024;
+				case "k":
+					$maxFileSize *= 1024;
+			}
+			
+			if ($_SERVER["CONTENT_LENGTH"] > $maxFileSize) {
+				$f3->error("Your file was too big! (Max: " . strtoupper(trim(ini_get("post_max_size"))) . "B)");
+			}
+			else {
+				$f3->error("No file was uploaded!");
+			}			
 		}
 	}
 );

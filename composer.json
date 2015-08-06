@@ -11,8 +11,25 @@
 			"email": "nehal@nehalpatel.me"
 		}
 	],
+	"repositories": [
+		{
+			"type": "package",
+			"package": {
+				"name": "ebildude123/fatfree",
+				"version": "1.0",
+				"source": {
+					"url": "https://github.com/ebildude123/fatfree.git",
+					"type": "git",
+					"reference": "master"
+				},
+				"autoload": {
+					"files": ["lib/base.php"]
+				}
+			}
+		}
+	],
 	"require": {
-		"bcosca/fatfree": "3.*",
-		"google/recaptcha": "~1.1"
+		"google/recaptcha": "~1.1",
+		"ebildude123/fatfree": "1.0"
 	}
 }
