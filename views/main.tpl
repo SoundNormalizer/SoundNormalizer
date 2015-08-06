@@ -41,6 +41,7 @@
 		<div id="upload-form">
 			<form method="POST" action="normalize" enctype="multipart/form-data">
 				<div class="input-group">
+					<div id="captcha-upload"></div>
 					<input id="file" type="file" name="file" accept=".mp3">
 					<span class="input-group-btn">
 						<button type="button" class="btn btn-info btn-lg input-btn" id="browse-button">
@@ -52,8 +53,6 @@
 					<span id="upload-button" class="input-group-btn">
 						<button type="button" class="btn btn-primary btn-lg input-btn" data-toggle="modal" data-target="#captcha-modal">Normalize</button>
 					</span>
-					
-					<div id="captcha-upload"></div>
 				</div>
 			</form>
 		</div>

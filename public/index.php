@@ -99,14 +99,12 @@ $f3->route("POST /normalize",
 		$f3->set("pageName", "Normalize");
 		$f3->set("pageType", "normalize");
 		
-		// Recaptcha not working with multipart/form-data set on form, but it needs to be set or file upload won't work.
-		// Need to look for work around later
-		/*$recaptcha = new \ReCaptcha\ReCaptcha($f3->get("recaptchaSecret"));
+		$recaptcha = new \ReCaptcha\ReCaptcha($f3->get("recaptchaSecret"));
 		$recapResp = $recaptcha->verify($_POST["g-recaptcha-response"], $_SERVER["REMOTE_ADDR"]);
 		
 		if (!$recapResp->isSuccess()) {
 			$f3->error("Invalid captcha!");
-		}*/
+		}
 		
 		if (isset($_FILES["file"]) && !empty($_FILES["file"])) {
 			$tmpName = $_FILES["file"]["tmp_name"];
