@@ -143,9 +143,16 @@ $f3->route("GET @download: /download",
 			$output_file = $output_dir . "/" . preg_replace('((^\.)|\/|(\.$))', '', $download["LocalName"]) . ".mp3";
 			
 			if (file_exists($output_file)) {
+				$filename = "[" . $f3->get("siteName") . "]_";
+				if ($download["Type"] == "youtube") {
+					$filename .= $download["YouTubeID"] . ".mp3";	
+				} else {
+					$filename .= $download["FileName"];
+				}
+
 				header("X-Sendfile: $output_file");
 				header("Content-type: audio/mpeg");
-				header('Content-Disposition: attachment; filename="' . basename($output_file) . '"');
+				header('Content-Disposition: attachment; filename="' . $filename . '"');
 				
 				die();
 			} else {
