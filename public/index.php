@@ -5,7 +5,9 @@ require "../settings.php";
 // Initialize framework
 $f3 = \Base::instance();
 $f3->set("siteName", "youtube2mp3");
+$f3->set("Core", new SoundNormalizer\Core($f3));
 $f3->set("DB", new \DB\SQL("mysql:host=" . $dbHost . ";dbname=" . $dbName . ";charset=utf8", $dbUser, $dbPass));
+$f3->set("DEBUG", 0);
 
 // Recaptcha info
 $f3->set("recaptchaSiteKey", $recaptchaSiteKey);
@@ -22,82 +24,47 @@ $f3->route("GET /",
 	}
 );
 
-// Route convert page
-$f3->route("POST /convert",
+// Route YouTube page
+$f3->route("POST /youtube",
 	function ($f3) {
-		$f3->set("pageName", "Convert");
-		$f3->set("pageType", "convert");
-		
+		$f3->set("pageName", "YouTube");
+		$f3->set("pageType", "youtube");
+
 		$recaptcha = new \ReCaptcha\ReCaptcha($f3->get("recaptchaSecret"));
 		$recapResp = $recaptcha->verify($_POST["g-recaptcha-response"], $_SERVER["REMOTE_ADDR"]);
 		
 		if (!$recapResp->isSuccess()) {
 			$f3->error("Invalid captcha!");
 		}
-		
-		$ip_query = $f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE (`IP` = :IP AND `Completed` = '0')");
-		$ip_query->bindValue(":IP", $_SERVER["REMOTE_ADDR"]);
-		$ip_query->execute();
-		
-		if ($ip_query->rowCount() > 0) {
-			$f3->error("Please wait for your current video to finish converting.");
+
+		if ($f3->get("Core")->isAlreadyConverting()) {
+			$f3->error("Please wait for your current file to finish converting.");
 		} else {
-			$url_parts = parse_url($_POST["url"]);
-			parse_str($url_parts["query"], $query_parts);
-			
-			if (strpos($url_parts["host"], "youtube.com") !== false) {
-				if (isset($query_parts["v"])) {
-					$video_id = $query_parts["v"];
-					$normalize = (isset($_POST["normalize-checkbox"]) ? 1 : 0);
-					
-					// check if the file has been converted recently
-					$duplicate_check_query = $f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE (`VideoID` = :VideoID AND `Normalized` = :Normalized AND `Completed` = '1' AND `StatusCode` = '3' AND `Deleted` = '0' AND `TimeCompleted` IS NOT NULL)");
-					$duplicate_check_query->bindValue(":VideoID", $video_id);
-					$duplicate_check_query->bindValue(":Normalized", $normalize);
-					$duplicate_check_query->execute();
-					
-					if ($duplicate_check_query->rowCount() > 0) {
-						$insert_query_str = "INSERT INTO `conversions` (`VideoID`, `Started`, `Completed`, `StatusCode`, `Normalized`, `IP`, `TimeAdded`) VALUES (:VideoID, TRUE, TRUE, '3', :Normalized, :IP, :TimeAdded)";
-					} else {						
-						$insert_query_str = "INSERT INTO `conversions` (`VideoID`, `Normalized`, `IP`, `TimeAdded`) VALUES (:VideoID, :Normalized, :IP, :TimeAdded)";
-					}
-					
-					try {
-						$insert_query = $f3->get("DB")->prepare($insert_query_str);
-						
-						$insert_query->bindValue(":VideoID", $video_id);
-						$insert_query->bindValue(":Normalized", $normalize);
-						$insert_query->bindValue(":IP", $_SERVER["REMOTE_ADDR"]);
-						$insert_query->bindValue(":TimeAdded", time());
-						
-						$insert_query->execute();
-						
-						if ($duplicate_check_query->rowCount() > 0) {
-							// redirect to download existing file
-							$f3->reroute("@download");
-						}
-						else {
-							// proceed with conversion
-							echo Template::instance()->render("../views/base.tpl");
-						}
-					} catch (PDOException $exception) { 
-						$f3->error("Database error!");
-					}
-				} else {
-					$f3->error("Invalid URL entered!");
-				}
-			} else {
+			$video_id = SoundNormalizer\Utilities::getYouTubeID($_POST["url"]);
+
+			if ($video_id === false) {
 				$f3->error("Invalid URL entered!");
+			} else {
+				$normalize = (isset($_POST["normalize-checkbox"]) ? 1 : 0);
+				$duplicate_check_results = $f3->get("Core")->fetchRecentCompletedMatches("youtube", $video_id, $normalize);
+
+				if (count($duplicate_check_results) > 0) {
+					$f3->get("Core")->insertDuplicateConversion("youtube", $duplicate_check_results[0]["ID"]);
+					$f3->reroute("@download");
+				} else {
+					$f3->get("Core")->insertConversion("youtube", $video_id, $normalize);
+					$f3->reroute("@status");
+				}
 			}
 		}
 	}
 );
 
-// Route upload to normalize page
-$f3->route("POST /normalize",
+// Route upload page
+$f3->route("POST /upload",
 	function($f3) {
-		$f3->set("pageName", "Normalize");
-		$f3->set("pageType", "normalize");
+		$f3->set("pageName", "Upload");
+		$f3->set("pageType", "upload");
 		
 		$recaptcha = new \ReCaptcha\ReCaptcha($f3->get("recaptchaSecret"));
 		$recapResp = $recaptcha->verify($_POST["g-recaptcha-response"], $_SERVER["REMOTE_ADDR"]);
@@ -151,8 +118,45 @@ $f3->route("POST /normalize",
 	}
 );
 
-// Route status path
-$f3->route("GET /status",
+// Route status page
+$f3->route("GET @status: /status",
+	function ($f3) {
+		$f3->set("pageName", "Status");
+		$f3->set("pageType", "status");
+
+		if ($f3->get("Core")->isAlreadyConverting()) {
+			echo Template::instance()->render("../views/base.tpl");
+		} else {
+			$f3->error("You have no files converting right now.");
+		}
+	}
+);
+
+// Route download path
+$f3->route("GET @download: /download",
+	function ($f3) {
+		$download = $f3->get("Core")->getDownload();
+		if ($download === false) {
+			$f3->error("No download found.");
+		} else {
+			$output_dir = realpath(dirname(__FILE__) . "/../converted/");
+			$output_file = $output_dir . "/" . preg_replace('((^\.)|\/|(\.$))', '', $download["LocalName"]) . ".mp3";
+			
+			if (file_exists($output_file)) {
+				header("X-Sendfile: $output_file");
+				header("Content-type: audio/mpeg");
+				header('Content-Disposition: attachment; filename="' . basename($output_file) . '"');
+				
+				die();
+			} else {
+				$f3->error("No download found.");
+			}
+		}
+	}
+);
+
+// Route status API
+$f3->route("GET /api/status",
 	function ($f3) {
 		$conversion_query = $f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE (`IP` = :IP AND `Deleted` = '0') ORDER BY `ID` DESC LIMIT 1");
 		$conversion_query->bindValue(":IP", $_SERVER["REMOTE_ADDR"]);
@@ -161,7 +165,7 @@ $f3->route("GET /status",
 		$status_response = array();
 		
 		if ($conversion_query->rowCount() > 0) {
-			$conversion = $conversion_query->fetch(PDO::FETCH_ASSOC);
+			$conversion = $conversion_query->fetch(\PDO::FETCH_ASSOC);
 			
 			if ($conversion["Started"] == "0") {
 				// conversion hasn't started
@@ -187,54 +191,6 @@ $f3->route("GET /status",
 		
 		header("Content-Type: application/json");
 		echo json_encode($status_response);
-	}
-);
-
-// Route download path
-$f3->route("GET @download: /download",
-	function ($f3) {
-		$conversion_query = $f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE (`IP` = :IP AND `Completed` = '1' AND `StatusCode` = '3' AND `Deleted` = '0') ORDER BY `ID` DESC LIMIT 1");
-		$conversion_query->bindValue(":IP", $_SERVER["REMOTE_ADDR"]);
-		$conversion_query->execute();
-		
-		if ($conversion_query->rowCount() > 0) {
-			$conversion = $conversion_query->fetch(PDO::FETCH_ASSOC);
-			
-			$output_dir = realpath(dirname(__FILE__) . "/../converted/");
-			$output_file = $output_dir . "/" . preg_replace('((^\.)|\/|(\.$))', '', $conversion["VideoID"]) . ".mp3";
-			
-			$continueWithDL = false;
-			
-			if (!empty($conversion["TimeCompleted"])) {
-				$continueWithDL = true;
-			}
-			else {
-				$duplicate_query = $f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE (`VideoID`=:videoID AND `TimeCompleted` IS NOT NULL AND `Completed` = '1' AND `StatusCode` = '3' AND `Deleted` = '0' AND `Normalized`=:normal) ORDER BY `ID` DESC LIMIT 1");
-				$duplicate_query->bindValue(":videoID", $conversion["VideoID"]);
-				$duplicate_query->bindValue(":normal", $conversion["Normalized"]);
-				$duplicate_query->execute();
-				
-				$get_duplicates = $duplicate_query->fetchAll();
-				if (count($get_duplicates) > 0) {
-					$continueWithDL = true;
-				}
-				else {
-					$f3->error("No download found.");
-				}
-			}
-			
-			if ($continueWithDL && file_exists($output_file)) {
-				header("X-Sendfile: $output_file");
-				header("Content-type: audio/mpeg");
-				header('Content-Disposition: attachment; filename="' . basename($output_file) . '"');
-				
-				die();
-			} else {
-				$f3->error("No download found.");
-			}
-		} else {			
-			$f3->error("No download found.");
-		}
 	}
 );
 

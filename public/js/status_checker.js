@@ -7,7 +7,7 @@ $(document).ready(function() {
 	
 	checkInterval = setInterval(function() {
 		$.ajax({
-			url: "status",
+			url: "api/status",
 			dataType: "json"
 		}).done(function(data) {
 			switch (data.response_message) {

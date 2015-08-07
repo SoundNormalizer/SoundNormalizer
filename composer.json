@@ -31,5 +31,10 @@
 	"require": {
 		"google/recaptcha": "~1.1",
 		"ebildude123/fatfree": "1.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"SoundNormalizer\\": "src/"
+		}
 	}
 }

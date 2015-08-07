@@ -11,19 +11,20 @@ require dirname(__FILE__) . "/../settings.php";
 $outputDir = realpath(dirname(__FILE__) . "/../converted/");
 $db = new PDO("mysql:host=" . $dbHost . ";dbname=" . $dbName . ";charset=utf8", $dbUser, $dbPass);
 
-$queueQuery = $db->prepare("SELECT `ID`,`VideoID`,`Normalized` FROM `conversions` WHERE `Started`=FALSE");
+$queueQuery = $db->prepare("SELECT `ID`,`LocalName`,`YouTubeID`,`Normalized` FROM `conversions` WHERE (`DuplicateOf` = '0' AND `Type` = 'youtube' AND `Started` = FALSE)");
 $queueQuery->execute();
 $unqueuedArr = $queueQuery->fetchAll();
 
 foreach ($unqueuedArr as $unqueued) {
 	$reqID = $unqueued["ID"];
-	$reqVideoID = $unqueued["VideoID"];
+	$reqLocalName = $unqueued["LocalName"];
+	$reqVideoID = $unqueued["YouTubeID"];
 	$reqNormalize = $unqueued["Normalized"];
 	
 	$updateQueue = $db->prepare("UPDATE `conversions` SET `Started`=TRUE, `TimeStarted`=UNIX_TIMESTAMP() WHERE `ID`=:id");
 	$updateQueue->execute(array(":id" => $reqID));
 	
-	$cmd = shell_exec($ytdlBin . " --extract-audio --prefer-ffmpeg --ffmpeg-location " . $ffmpegDir . " --audio-quality 128K --audio-format mp3 -o \"" . $outputDir . "/%(id)s.%(ext)s\" --add-metadata --sleep-interval 1 -- " . escapeshellarg($reqVideoID));
+	$cmd = shell_exec($ytdlBin . " --extract-audio --prefer-ffmpeg --ffmpeg-location " . $ffmpegDir . " --audio-quality 128K --audio-format mp3 -o \"" . $outputDir . "/" . $reqLocalName . ".%(ext)s\" --add-metadata --sleep-interval 1 -- " . escapeshellarg($reqVideoID));
 	if (strpos($cmd, "YouTube said: This video does not exist") !== false) {
 		// Video is non-existent
 		$statusCode = 1;
@@ -37,7 +38,7 @@ foreach ($unqueuedArr as $unqueued) {
 		$statusCode = 3;
 		
 		if ($reqNormalize) {
-			$outputFile = $outputDir . "/" . preg_replace('((^\.)|\/|(\.$))', '', $reqVideoID);
+			$outputFile = $outputDir . "/" . preg_replace('((^\.)|\/|(\.$))', '', $reqLocalName);
 			$normalizeCmd = shell_exec($mp3gainBin . " " . escapeshellarg($outputFile));
 		}
 	}

@@ -14,7 +14,7 @@
 				<script src="js/main.js"></script>
 			</true>
 		</check>
-		<check if="{{ @pageType == 'convert' }}">
+		<check if="{{ @pageType == 'status' }}">
 			<true>
 				<script src="js/status_checker.js"></script>
 			</true>

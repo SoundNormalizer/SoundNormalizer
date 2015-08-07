@@ -4,7 +4,7 @@
 			<span class="instruction-text" id="upload-instructions"><strong>Browse for a file</strong> to upload and submit to <strong>normalize audio track(s)</strong></span>
 		</h1>
 		<div id="youtube-form">
-			<form method="POST" action="convert">
+			<form method="POST" action="youtube">
 				<div class="input-group">
 					<input id="youtube-url" name="url" type="text" class="form-control input-lg input-text" placeholder="Example: https://www.youtube.com/watch?v=dQw4w9WgXcQ">
 					<span class="input-group-btn">
@@ -39,7 +39,7 @@
 			</form>
 		</div>
 		<div id="upload-form">
-			<form method="POST" action="normalize" enctype="multipart/form-data">
+			<form method="POST" action="upload" enctype="multipart/form-data">
 				<div class="input-group">
 					<div id="captcha-upload"></div>
 					<input id="file" type="file" name="file" accept=".mp3">
