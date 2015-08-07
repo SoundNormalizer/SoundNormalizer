@@ -72,21 +72,51 @@ $f3->route("POST /upload",
 		if (!$recapResp->isSuccess()) {
 			$f3->error("Invalid captcha!");
 		}
+		elseif ($f3->get("Core")->isAlreadyConverting()) {
+			$f3->error("Please wait for your current file to finish converting.");
+		}
 		
 		if (isset($_FILES["file"]) && !empty($_FILES["file"])) {
 			$tmpName = $_FILES["file"]["tmp_name"];
 			$fileError = $_FILES["file"]["error"];
+			$uploadName = $_FILES["file"]["name"];
 			
 			if ($fileError === UPLOAD_ERR_OK) {
 				$finfo = finfo_open(FILEINFO_MIME_TYPE);
 				$mimeType = finfo_file($finfo, $tmpName);
+				$fileExt = strtolower(pathinfo($uploadName, PATHINFO_EXTENSION));
 			
-				if ($mimeType != "audio/mpeg") {
+				if (($mimeType != "audio/mpeg") || ($fileExt != "mp3")) {
 					$f3->error("Only MP3 files can be normalized.");
 				}
 				else {
-					echo "i plan to do stuff here.";
-				}				
+					$fileHash = md5_file($tmpName);					
+					$localName = \SoundNormalizer\Utilities::getRandomHash();			
+					
+					$fileName = trim(basename($uploadName));
+					if (substr($fileName, 0, 1) == ".") {
+						$fileName = substr($fileName, 1);
+					}					
+					
+					$fileName = preg_replace("([^\w\s\d\-_~,;:\[\]\(\).])", '', $fileName);
+					$fileName = preg_replace("([\.]{2,})", '', $fileName);
+				
+					if (empty($fileName) || (strlen($fileName) > (255 - strlen("[" . $f3->get("siteName") . "]_")))) {
+						$fileName = $localName . ".mp3";
+					}
+					
+					move_uploaded_file($tmpName, "../converted/" . $localName . ".mp3");
+					
+					$duplicate_check_results = $f3->get("Core")->fetchRecentCompletedMatches("upload", $fileHash, 1);
+					if (count($duplicate_check_results) > 0) {
+						$f3->get("Core")->insertDuplicateConversion("upload", $duplicate_check_results[0]["ID"]);
+						$f3->reroute("@download");
+					}
+					else {
+						$f3->get("Core")->insertConversion("upload", $fileHash, 1, $fileName, $localName);
+						$f3->reroute("@status");
+					}
+				}
 			}
 			elseif ($fileError === UPLOAD_ERR_NO_FILE) {
 				$f3->error("No file was uploaded!");
@@ -190,6 +220,7 @@ $f3->route("GET /api/status",
 					$status_response["status_code"] = $conversion["StatusCode"];
 				}
 			}
+			$status_response["conversion_type"] = $conversion["Type"];
 		} else {
 			// no conversion queued
 			$status_response["response_type"] = "error";

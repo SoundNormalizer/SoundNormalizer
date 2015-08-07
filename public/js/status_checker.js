@@ -10,19 +10,29 @@ $(document).ready(function() {
 			url: "api/status",
 			dataType: "json"
 		}).done(function(data) {
+			var statusType;
+			if (data.response_type == "success") {
+				if (data.conversion_type == "youtube") {
+					statusType = "Conversion";
+				}
+				else {
+					statusType = "Normalization";
+				}
+			}
+			
 			switch (data.response_message) {
 				case "conversion_queued":
 					$("#status").text("In Queue");
 					break;
 					
 				case "conversion_started":
-					$("#status").text("Conversion started");
+					$("#status").text(statusType + " started");
 					break;
 					
 				case "conversion_completed":
 					switch (parseInt(data.status_code)) {
 						case 3:
-							$("#status").text("Conversion complete");
+							$("#status").text(statusType + " complete");
 							
 							var btnHtml = '<button type="submit" class="btn btn-primary btn-block" id="dlBtn"><span class="glyphicon glyphicon-download-alt"></span> &nbsp; Download Converted MP3</button>';
 							$(".progress").before(btnHtml);
@@ -30,19 +40,27 @@ $(document).ready(function() {
 							break;
 							
 						case 1:
-							displayError("Conversion failed: The video doesn't exist");
+							displayError(statusType + " failed: The video doesn't exist");
 							break;
 							
 						case 2:
-							displayError("Conversion failed: Couldn't load the video");
+							displayError(statusType + " failed: Couldn't load the video");
 							break;
 							
 						case 4:
-							displayError("Conversion failed: Unknown error");
+							displayError(statusType + " failed: Unknown error");
+							break;
+							
+						case 5:
+							displayError(statusType + " failed: File not found");
+							break;
+							
+						case 6:
+							displayError(statusType + " failed: Corrupted MP3 file");
 							break;
 						
 						default:
-							displayError("Conversion failed: Unknown status");
+							displayError(statusType + " failed: Unknown status");
 							break;
 					}
 					

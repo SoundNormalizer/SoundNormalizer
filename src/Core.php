@@ -41,33 +41,36 @@ class Core
 		return $duplicate_check_query->fetchAll();
 	}
 
-	public function insertConversion($type, $id, $normalized)
+	public function insertConversion($type, $id, $normalized, $name = null, $local = null)
 	{
-		if ($type == "youtube") {
+		if ($type == "youtube") {						
 			$insert_query = $this->_f3->get("DB")->prepare("INSERT INTO `conversions` (`Type`, `LocalName`, `YouTubeID`, `Normalized`, `IP`, `TimeAdded`) VALUES (:Type, :LocalName, :YouTubeID, :Normalized, :IP, :TimeAdded)");
-			$insert_query->bindValue(":Type", "youtube");
-			$insert_query->bindValue(":LocalName", Utilities::getRandomHash());
 			$insert_query->bindValue(":YouTubeID", $id);
-			$insert_query->bindValue(":Normalized", $normalized);
-			$insert_query->bindValue(":IP", Utilities::getIP());
-			$insert_query->bindValue(":TimeAdded", time());
+			$insert_query->bindValue(":LocalName", Utilities::getRandomHash());			
 		} elseif ($type == "upload") {
-			// implement this weidi
+			$insert_query = $this->_f3->get("DB")->prepare("INSERT INTO `conversions` (`Type`, `LocalName`, `FileName`, `FileHash`, `Normalized`, `IP`, `TimeAdded`) VALUES (:Type, :LocalName, :name, :hash, :Normalized, :IP, :TimeAdded)");
+			$insert_query->bindValue(":name", $name);
+			$insert_query->bindValue(":hash", $id);
+			$insert_query->bindValue(":LocalName", $local);
 		}
-
+		
+		$insert_query->bindValue(":Type", $type);		
+		$insert_query->bindValue(":Normalized", $normalized);
+		$insert_query->bindValue(":IP", Utilities::getIP());
+		$insert_query->bindValue(":TimeAdded", time());
 		$insert_query->execute();
 	}
 
 	public function insertDuplicateConversion($type, $duplicateOf)
 	{
-		if ($type == "youtube") {
-			$insert_query = $this->_f3->get("DB")->prepare("INSERT INTO `conversions` (`Type`, `DuplicateOf`) VALUES (:Type, :DuplicateOf)");
-			$insert_query->bindValue(":Type", "youtube");
-			$insert_query->bindValue(":DuplicateOf", $duplicateOf);
-			$insert_query->execute();
+		$insert_query = $this->_f3->get("DB")->prepare("INSERT INTO `conversions` (`Type`, `DuplicateOf`) VALUES (:Type, :DuplicateOf)");
+		if ($type == "youtube") {			
+			$insert_query->bindValue(":Type", "youtube");			
 		} else {
-			// implement this weidi
+			$insert_query->bindValue(":Type", "upload");
 		}
+		$insert_query->bindValue(":DuplicateOf", $duplicateOf);
+		$insert_query->execute();
 	}
 
 	public function getConversion($id) {

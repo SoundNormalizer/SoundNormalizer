@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6aaa250a66163c1aa9119ed2b47e5493",
+    "hash": "5cdd042bf6b6f3d6f2a2c08781e892e6",
     "packages": [
         {
             "name": "ebildude123/fatfree",
