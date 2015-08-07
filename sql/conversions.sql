@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Aug 04, 2015 at 01:43 AM
+-- Generation Time: Aug 07, 2015 at 06:12 AM
 -- Server version: 5.5.44-0ubuntu0.14.04.1
 -- PHP Version: 5.6.11-1+deb.sury.org~trusty+1
 
@@ -28,7 +28,12 @@ SET time_zone = "+00:00";
 
 CREATE TABLE IF NOT EXISTS `conversions` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `VideoID` text NOT NULL,
+  `DuplicateOf` bigint(20) NOT NULL,
+  `Type` text NOT NULL,
+  `LocalName` text NOT NULL,
+  `YouTubeID` text NOT NULL,
+  `FileName` text NOT NULL,
+  `FileHash` text NOT NULL,
   `Started` tinyint(1) NOT NULL DEFAULT '0',
   `Completed` tinyint(1) NOT NULL DEFAULT '0',
   `StatusCode` int(11) DEFAULT NULL,
