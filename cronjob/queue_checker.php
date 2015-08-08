@@ -45,9 +45,14 @@ foreach ($unqueuedArr as $unqueued) {
 	}
 	
 	// Check if we should normalize it
-	if (($reqNormalize && $statusCode == 3) || ($reqType == "upload")) {
+	if ((($reqNormalize == 1) && ($statusCode == 3)) || ($reqType == "upload")) {
 		$outputFile = $outputDir . "/" . preg_replace('((^\.)|\/|(\.$))', '', $reqLocalName) . ".mp3";
-		$normalizeCmd = shell_exec($mp3gainBin . " " . escapeshellarg($outputFile));
+
+		$normalizeValueCmd = shell_exec($mp3gainBin . " -o " . escapeshellarg($outputFile));
+		$normalizeValueResult = explode(PHP_EOL, trim($normalizeValueCmd));
+		$normalizeValue = explode("\t", $normalizeValueResult[1])[1];
+
+		$normalizeCmd = shell_exec($mp3gainBin . " -g " . $normalizeValue . " " . escapeshellarg($outputFile));
 		
 		if (strpos($normalizeCmd, "Can't open") !== false) {
 			// File doesn't exist
