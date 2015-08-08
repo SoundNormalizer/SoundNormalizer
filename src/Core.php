@@ -43,34 +43,65 @@ class Core
 
 	public function insertConversion($type, $id, $normalized, $name = null, $local = null)
 	{
-		if ($type == "youtube") {						
-			$insert_query = $this->_f3->get("DB")->prepare("INSERT INTO `conversions` (`Type`, `LocalName`, `YouTubeID`, `Normalized`, `IP`, `TimeAdded`) VALUES (:Type, :LocalName, :YouTubeID, :Normalized, :IP, :TimeAdded)");
-			$insert_query->bindValue(":YouTubeID", $id);
-			$insert_query->bindValue(":LocalName", Utilities::getRandomHash());			
-		} elseif ($type == "upload") {
-			$insert_query = $this->_f3->get("DB")->prepare("INSERT INTO `conversions` (`Type`, `LocalName`, `FileName`, `FileHash`, `Normalized`, `IP`, `TimeAdded`) VALUES (:Type, :LocalName, :name, :hash, :Normalized, :IP, :TimeAdded)");
-			$insert_query->bindValue(":name", $name);
-			$insert_query->bindValue(":hash", $id);
-			$insert_query->bindValue(":LocalName", $local);
+		try {
+			$insert_parameters = array();
+			if ($type == "youtube") {						
+				$insert_query = "INSERT INTO `conversions` (`Type`, `LocalName`, `YouTubeID`, `Normalized`, `IP`, `TimeAdded`) VALUES (:Type, :LocalName, :YouTubeID, :Normalized, :IP, :TimeAdded)";
+				$insert_parameters[":YouTubeID"] = $id;
+				$insert_parameters[":LocalName"] = Utilities::getRandomHash();			
+			} elseif ($type == "upload") {
+				$insert_query = "INSERT INTO `conversions` (`Type`, `LocalName`, `FileName`, `FileHash`, `Normalized`, `IP`, `TimeAdded`) VALUES (:Type, :LocalName, :name, :hash, :Normalized, :IP, :TimeAdded)";
+				$insert_parameters[":name"] = $name;
+				$insert_parameters[":hash"] = $id;
+				$insert_parameters[":LocalName"] = $local;
+			}
+			
+			$insert_parameters[":Type"] = $type;		
+			$insert_parameters[":Normalized"] = $normalized;
+			$insert_parameters[":IP"] = Utilities::getIP();
+			$insert_parameters[":TimeAdded"] = time();
+
+			$this->_f3->get("DB")->exec($insert_query, $insert_parameters);
+		} catch (\PDOException $e) {
+			$error_info = array(
+				"parameters" => $insert_parameters,
+				"error" => array(
+					"message" => $e->getMessage(),
+					"trace" => $e->getTrace()
+				)
+			);
+
+			$this->_f3->get("log")->addError("Attempt at adding `" . $type . "` conversion", $error_info);
+			$this->_f3->error("Database error.");
 		}
-		
-		$insert_query->bindValue(":Type", $type);		
-		$insert_query->bindValue(":Normalized", $normalized);
-		$insert_query->bindValue(":IP", Utilities::getIP());
-		$insert_query->bindValue(":TimeAdded", time());
-		$insert_query->execute();
 	}
 
 	public function insertDuplicateConversion($type, $duplicateOf)
 	{
-		$insert_query = $this->_f3->get("DB")->prepare("INSERT INTO `conversions` (`Type`, `DuplicateOf`) VALUES (:Type, :DuplicateOf)");
-		if ($type == "youtube") {			
-			$insert_query->bindValue(":Type", "youtube");			
-		} else {
-			$insert_query->bindValue(":Type", "upload");
+		try {
+			$insert_query = "INSERT INTO `conversions` (`Type`, `DuplicateOf`) VALUES (:Type, :DuplicateOf)";
+			$insert_parameters = array();
+			$insert_parameters[":DuplicateOf"] = $duplicateOf;
+
+			if ($type == "youtube") {			
+				$insert_parameters[":Type"] = "youtube";			
+			} else {
+				$insert_parameters[":Type"] = "upload";
+			}
+
+			$this->_f3->get("DB")->exec($insert_query, $insert_parameters);
+		} catch (\PDOException $e) {
+			$error_info = array(
+				"parameters" => $insert_parameters,
+				"error" => array(
+					"message" => $e->getMessage(),
+					"trace" => $e->getTrace()
+				)
+			);
+
+			$this->_f3->get("log")->addError("Attempt at adding duplicate `" . $type . "` conversion", $error_info);
+			$this->_f3->error("Database error.");
 		}
-		$insert_query->bindValue(":DuplicateOf", $duplicateOf);
-		$insert_query->execute();
 	}
 
 	public function getConversion($id) {

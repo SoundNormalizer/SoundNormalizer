@@ -2,12 +2,19 @@
 require_once("../vendor/autoload.php");
 require "../settings.php";
 
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
 // Initialize framework
 $f3 = \Base::instance();
 $f3->set("siteName", "youtube2mp3");
 $f3->set("Core", new SoundNormalizer\Core($f3));
 $f3->set("DB", new \DB\SQL("mysql:host=" . $dbHost . ";dbname=" . $dbName . ";charset=utf8", $dbUser, $dbPass));
+$f3->get("DB")->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION); 
 $f3->set("DEBUG", 0);
+
+$f3->set("log", new Logger($f3->get("siteName")));
+$f3->get("log")->pushHandler(new StreamHandler($logLocation));
 
 // Recaptcha info
 $f3->set("recaptchaSiteKey", $recaptchaSiteKey);

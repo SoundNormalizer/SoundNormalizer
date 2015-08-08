@@ -30,7 +30,8 @@
 	],
 	"require": {
 		"google/recaptcha": "~1.1",
-		"ebildude123/fatfree": "1.0"
+		"ebildude123/fatfree": "1.0",
+		"monolog/monolog": "^1.15"
 	},
 	"autoload": {
 		"psr-4": {

@@ -8,4 +8,6 @@ $dbPass = "";
 $recaptchaSiteKey = "";
 $recaptchaSecret = "";
 $recaptchaLang = "en";
+
+$logLocation = "/path/to/app.log";
 ?>
