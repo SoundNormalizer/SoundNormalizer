@@ -50,9 +50,4 @@ function captchaSuccess() {
 	setTimeout(function() {
 		$(selectedForm + " form").submit();
 	}, 1000);
-	// if user is still on page because of being redirected to /download
-	setTimeout(function() {
-		$("#captcha-modal").modal("hide");
-		grecaptcha.reset();
-	}, 4000);
 }
