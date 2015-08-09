@@ -224,6 +224,8 @@ $f3->route("GET /api/status",
 			$status_response["response_type"] = "error";
 			$status_response["response_message"] = "no_conversion_found";
 		} else {
+			$status_response["normalized"] = $conversion["Normalized"];
+			
 			if ($conversion["Started"] == "0") {
 				// conversion hasn't started
 				$status_response["response_type"] = "success";

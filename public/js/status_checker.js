@@ -10,13 +10,14 @@ $(document).ready(function() {
 			url: "api/status",
 			dataType: "json"
 		}).done(function(data) {
-			var statusType;
+			var statusType = "Normalization";
+			var buttonText = "Normalized";
 			if (data.response_type == "success") {
 				if (data.conversion_type == "youtube") {
-					statusType = "Conversion";
-				}
-				else {
-					statusType = "Normalization";
+					if (parseInt(data.normalization) == 0) {
+						statusType = "Conversion";
+						statusType = "Converted";
+					}
 				}
 			}
 			
@@ -34,7 +35,7 @@ $(document).ready(function() {
 						case 3:
 							$("#status").text(statusType + " complete");
 							
-							var btnHtml = '<button type="submit" class="btn btn-primary btn-block" id="dlBtn"><span class="glyphicon glyphicon-download-alt"></span> &nbsp; Download Converted MP3</button>';
+							var btnHtml = '<button type="submit" class="btn btn-primary btn-block" id="dlBtn"><span class="glyphicon glyphicon-download-alt"></span> &nbsp; Download ' + buttonText + ' MP3</button>';
 							$(".progress").before(btnHtml);
 							$(".progress").remove();
 							break;
