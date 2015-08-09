@@ -16,7 +16,7 @@ $(document).ready(function() {
 				if (data.conversion_type == "youtube") {
 					if (parseInt(data.normalization) == 0) {
 						statusType = "Conversion";
-						statusType = "Converted";
+						buttonText = "Converted";
 					}
 				}
 			}
