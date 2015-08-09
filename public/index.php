@@ -53,11 +53,16 @@ $f3->route("POST /youtube",
 				$f3->error("Invalid URL entered!");
 			} else {
 				$normalize = (isset($_POST["normalize-checkbox"]) ? 1 : 0);
-				$duplicate_check_results = $f3->get("Core")->fetchRecentCompletedMatches("youtube", $video_id, $normalize);
+				$duplicate_check_results = $f3->get("Core")->fetchRecentMatches("youtube", $video_id, $normalize);
 
 				if (count($duplicate_check_results) > 0) {
-					$f3->get("Core")->insertDuplicateConversion("youtube", $duplicate_check_results[0]["ID"]);
-					$f3->reroute("@download");
+					$duplicate_conversion = $duplicate_check_results[0];
+
+					if ($duplicate_conversion["IP"] != SoundNormalizer\Utilities::getIP()) {
+						$f3->get("Core")->insertDuplicateConversion("youtube", $duplicate_conversion["ID"]);
+					}
+
+					$f3->reroute("@status");
 				} else {
 					$f3->get("Core")->insertConversion("youtube", $video_id, $normalize);
 					$f3->reroute("@status");
@@ -114,10 +119,15 @@ $f3->route("POST /upload",
 					
 					move_uploaded_file($tmpName, "../converted/" . $localName . ".mp3");
 					
-					$duplicate_check_results = $f3->get("Core")->fetchRecentCompletedMatches("upload", $fileHash, 1);
+					$duplicate_check_results = $f3->get("Core")->fetchRecentMatches("upload", $fileHash, 1);
 					if (count($duplicate_check_results) > 0) {
-						$f3->get("Core")->insertDuplicateConversion("upload", $duplicate_check_results[0]["ID"]);
-						$f3->reroute("@download");
+						$duplicate_conversion = $duplicate_check_results[0];
+
+						if ($duplicate_conversion["IP"] != SoundNormalizer\Utilities::getIP()) {
+							$f3->get("Core")->insertDuplicateConversion("upload", $duplicate_conversion["ID"]);
+						}
+
+						$f3->reroute("@status");
 					}
 					else {
 						$f3->get("Core")->insertConversion("upload", $fileHash, 1, $fileName, $localName);
@@ -161,7 +171,7 @@ $f3->route("GET @status: /status",
 		$f3->set("pageName", "Status");
 		$f3->set("pageType", "status");
 
-		if ($f3->get("Core")->isAlreadyConverting()) {
+		if ($f3->get("Core")->getLatestConversion() !== false) {
 			echo Template::instance()->render("../views/base.tpl");
 		} else {
 			$f3->error("You have no files converting right now.");
@@ -176,24 +186,28 @@ $f3->route("GET @download: /download",
 		if ($download === false) {
 			$f3->error("No download found.");
 		} else {
-			$output_dir = realpath(dirname(__FILE__) . "/../converted/");
-			$output_file = $output_dir . "/" . preg_replace('((^\.)|\/|(\.$))', '', $download["LocalName"]) . ".mp3";
-			
-			if (file_exists($output_file)) {
-				$filename = "[" . $f3->get("siteName") . "]_";
-				if ($download["Type"] == "youtube") {
-					$filename .= $download["YouTubeID"] . ".mp3";	
-				} else {
-					$filename .= $download["FileName"];
-				}
-
-				header("X-Sendfile: $output_file");
-				header("Content-type: audio/mpeg");
-				header('Content-Disposition: attachment; filename="' . $filename . '"');
-				
-				die();
+			if ($download["Deleted"] == 1) {
+				$f3->error("The download expired.");
 			} else {
-				$f3->error("No download found.");
+				$output_dir = realpath(dirname(__FILE__) . "/../converted/");
+				$output_file = $output_dir . "/" . preg_replace('((^\.)|\/|(\.$))', '', $download["LocalName"]) . ".mp3";
+				
+				if (file_exists($output_file)) {
+					$filename = "[" . $f3->get("siteName") . "]_";
+					if ($download["Type"] == "youtube") {
+						$filename .= $download["YouTubeID"] . ".mp3";	
+					} else {
+						$filename .= $download["FileName"];
+					}
+
+					header("X-Sendfile: $output_file");
+					header("Content-type: audio/mpeg");
+					header('Content-Disposition: attachment; filename="' . $filename . '"');
+					
+					die();
+				} else {
+					$f3->error("No download found.");
+				}
 			}
 		}
 	}
@@ -202,15 +216,14 @@ $f3->route("GET @download: /download",
 // Route status API
 $f3->route("GET /api/status",
 	function ($f3) {
-		$conversion_query = $f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE (`IP` = :IP AND `Deleted` = '0') ORDER BY `ID` DESC LIMIT 1");
-		$conversion_query->bindValue(":IP", $_SERVER["REMOTE_ADDR"]);
-		$conversion_query->execute();
-		
+		$conversion = $f3->get("Core")->getLatestConversion();
+
 		$status_response = array();
-		
-		if ($conversion_query->rowCount() > 0) {
-			$conversion = $conversion_query->fetch(\PDO::FETCH_ASSOC);
-			
+		if ($conversion === false) {
+			// no conversion queued
+			$status_response["response_type"] = "error";
+			$status_response["response_message"] = "no_conversion_found";
+		} else {
 			if ($conversion["Started"] == "0") {
 				// conversion hasn't started
 				$status_response["response_type"] = "success";
@@ -228,12 +241,8 @@ $f3->route("GET /api/status",
 				}
 			}
 			$status_response["conversion_type"] = $conversion["Type"];
-		} else {
-			// no conversion queued
-			$status_response["response_type"] = "error";
-			$status_response["response_message"] = "no_conversion_found";
 		}
-		
+
 		header("Content-Type: application/json");
 		echo json_encode($status_response);
 	}

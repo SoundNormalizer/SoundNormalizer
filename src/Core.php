@@ -13,7 +13,7 @@ class Core
 
 	public function isAlreadyConverting()
 	{
-		$conversions_query = $this->_f3->get("DB")->prepare("SELECT `ID` FROM `conversions` WHERE (`IP` = :IP AND `Completed` = '0')");
+		$conversions_query = $this->_f3->get("DB")->prepare("SELECT `ID` FROM `conversions` WHERE (`DuplicateOf` = 0 AND `IP` = :IP AND `Completed` = '0')");
 		$conversions_query->bindValue(":IP", Utilities::getIP());
 		$conversions_query->execute();
 		$conversions_results = $conversions_query->fetchAll();
@@ -25,13 +25,13 @@ class Core
 		}
 	}
 
-	public function fetchRecentCompletedMatches($type, $id, $normalized)
+	public function fetchRecentMatches($type, $id, $normalized)
 	{
 		if ($type == "youtube") {
-			$duplicate_check_query = $this->_f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE (`YouTubeID` = :YouTubeID AND `DuplicateOf` = '0' AND `Normalized` = :Normalized AND `Completed` = '1' AND `StatusCode` = '3' AND `Deleted` = '0' AND `TimeCompleted` IS NOT NULL)");
+			$duplicate_check_query = $this->_f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE (`YouTubeID` = :YouTubeID AND `DuplicateOf` = '0' AND `Normalized` = :Normalized AND `Deleted` = '0')");
 			$duplicate_check_query->bindValue(":YouTubeID", $id);
 		} elseif ($type == "upload") {
-			$duplicate_check_query = $this->_f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE (`FileHash` = :FileHash AND `DuplicateOf` = '0' AND `Normalized` = :Normalized AND `Completed` = '1' AND `StatusCode` = '3' AND `Deleted` = '0' AND `TimeCompleted` IS NOT NULL)");
+			$duplicate_check_query = $this->_f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE (`FileHash` = :FileHash AND `DuplicateOf` = '0' AND `Normalized` = :Normalized AND `Deleted` = '0')");
 			$duplicate_check_query->bindValue(":FileHash", $id);
 		}
 
@@ -79,9 +79,11 @@ class Core
 	public function insertDuplicateConversion($type, $duplicateOf)
 	{
 		try {
-			$insert_query = "INSERT INTO `conversions` (`Type`, `DuplicateOf`) VALUES (:Type, :DuplicateOf)";
+			$insert_query = "INSERT INTO `conversions` (`Type`, `DuplicateOf`, `IP`, `TimeAdded`) VALUES (:Type, :DuplicateOf, :IP, :TimeAdded)";
 			$insert_parameters = array();
 			$insert_parameters[":DuplicateOf"] = $duplicateOf;
+			$insert_parameters[":IP"] = Utilities::getIP();
+			$insert_parameters[":TimeAdded"] = time();
 
 			if ($type == "youtube") {			
 				$insert_parameters[":Type"] = "youtube";			
@@ -105,8 +107,8 @@ class Core
 	}
 
 	public function getConversion($id) {
-		$conversion_query = $this->_f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE `IP` = :IP");
-		$conversion_query->bindValue(":IP", Utilities::getIP());
+		$conversion_query = $this->_f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE `ID` = :ID");
+		$conversion_query->bindValue(":ID", $id);
 		$conversion_query->execute();
 
 		if ($conversion_query->rowCount() > 0) {
@@ -116,9 +118,28 @@ class Core
 		}
 	}
 
+	public function getLatestConversion() {
+		$conversion_query = $this->_f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE (`IP` = :IP AND `Deleted` = '0') ORDER BY `ID` DESC LIMIT 1");
+		$conversion_query->bindValue(":IP", Utilities::getIP());
+		$conversion_query->execute();
+
+		if ($conversion_query->rowCount() > 0) {
+			$conversion_result = $conversion_query->fetch(\PDO::FETCH_ASSOC);
+
+			$duplicate_id = $conversion_result["DuplicateOf"];
+			if ($duplicate_id > 0) {
+				return $this->getConversion($duplicate_id);
+			} else {
+				return $conversion_result;
+			}
+		} else {
+			return false;
+		}
+	}
+
 	public function getDownload()
 	{
-		$download_query = $this->_f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE (`IP` = :IP AND `Completed` = '1' AND `StatusCode` = '3' AND `Deleted` = '0') ORDER BY `ID` DESC LIMIT 1");
+		$download_query = $this->_f3->get("DB")->prepare("SELECT * FROM `conversions` WHERE (`IP` = :IP AND `Completed` = '1' AND `StatusCode` = '3') ORDER BY `ID` DESC LIMIT 1");
 		$download_query->bindValue(":IP", Utilities::getIP());
 		$download_query->execute();
 
