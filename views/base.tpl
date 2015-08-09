@@ -44,6 +44,14 @@
 				<include href="{{ '../views/' . @pageType . '.tpl' }}" />
 			</div>
 		</div>
+
+		<check if="{{ @adCode != null }}">
+			<true>
+				<div class="col-md-8 col-md-offset-2">
+					{{ @adCode }}	
+				</div>
+			</true>
+		</check>
 	</div>
 	<footer>
 		<div class="container">

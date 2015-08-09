@@ -12,6 +12,7 @@ $f3->set("Core", new SoundNormalizer\Core($f3));
 $f3->set("DB", new \DB\SQL("mysql:host=" . $dbHost . ";dbname=" . $dbName . ";charset=utf8", $dbUser, $dbPass));
 $f3->get("DB")->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION); 
 $f3->set("DEBUG", 0);
+$f3->set("ESCAPE", false);
 
 $f3->set("log", new Logger($f3->get("siteName")));
 $f3->get("log")->pushHandler(new StreamHandler($logLocation));
@@ -20,6 +21,9 @@ $f3->get("log")->pushHandler(new StreamHandler($logLocation));
 $f3->set("recaptchaSiteKey", $recaptchaSiteKey);
 $f3->set("recaptchaSecret", $recaptchaSecret);
 $f3->set("recaptchaLang", $recaptchaLang);
+
+// Set ads html code
+$f3->set("adCode", $adCode);
 
 // Route home page
 $f3->route("GET /",

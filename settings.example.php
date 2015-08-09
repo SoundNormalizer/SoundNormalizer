@@ -10,4 +10,6 @@ $recaptchaSecret = "";
 $recaptchaLang = "en";
 
 $logLocation = "/path/to/app.log";
+
+$adCode = "";
 ?>
