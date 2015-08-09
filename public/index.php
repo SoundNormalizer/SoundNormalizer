@@ -7,7 +7,7 @@ use Monolog\Handler\StreamHandler;
 
 // Initialize framework
 $f3 = \Base::instance();
-$f3->set("siteName", "youtube2mp3");
+$f3->set("siteName", "Sound Normalizer");
 $f3->set("Core", new SoundNormalizer\Core($f3));
 $f3->set("DB", new \DB\SQL("mysql:host=" . $dbHost . ";dbname=" . $dbName . ";charset=utf8", $dbUser, $dbPass));
 $f3->get("DB")->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION); 
