@@ -24,7 +24,19 @@ $(document).ready(function() {
 		
 		return false;
 	});
+
+	// show recaptcha modal if user hits enter to submit form
+	$("#youtube-url").keypress(formKeypress);
+	$("#file-name").keypress(formKeypress);
 });
+
+function formKeypress(e) {
+	if (e.which == 13) {
+		$("#captcha-modal").modal("show");
+
+		return false;
+	}
+}
 
 function toggleForm() {
 	// switch forms
