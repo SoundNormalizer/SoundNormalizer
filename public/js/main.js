@@ -1,4 +1,4 @@
-var selectedForm = "#youtube-form";
+var selectedForm = "youtube";
 
 $(document).ready(function() {
 	// register handlers to switch forms
@@ -47,19 +47,23 @@ function toggleForm() {
 	$("#youtube-instructions").toggle();
 	$("#upload-instructions").toggle();
 	
-	if ($("#captcha-upload").html().trim() == "") {
-		$("#captcha-modal").appendTo("#captcha-upload");
-		selectedForm = "#upload-form";
+	if (selectedForm == "youtube") {
+		selectedForm = "upload";
+
+		$("form").attr("action", "upload");
+		$("form").attr("enctype", "multipart/form-data");
 	}
 	else {
-		$("#captcha-modal").appendTo("#captcha-youtube");
-		selectedForm = "#youtube-form";
+		selectedForm = "youtube";
+
+		$("form").attr("action", "youtube");
+		$("form").removeAttr("enctype");
 	}
 }
 
 function captchaSuccess() {
 	// 1 second delay so the green checkmark animation completes and user sees it
 	setTimeout(function() {
-		$(selectedForm + " form").submit();
+		$("form").submit();
 	}, 1000);
 }

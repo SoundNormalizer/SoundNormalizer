@@ -26,6 +26,19 @@ $f3->route("GET /",
 	function ($f3) {
 		$f3->set("pageName", "Home");
 		$f3->set("pageType", "main");
+
+		// ini config value to bytes adapted from http://php.net/manual/en/function.ini-get.php
+		$maxFileSize = trim(ini_get("post_max_size"));
+		$sizeUnit = strtolower(substr($maxFileSize, -1));
+		switch($sizeUnit) {
+			case "g":
+				$maxFileSize *= 1024;
+			case "m":
+				$maxFileSize *= 1024;
+			case "k":
+				$maxFileSize *= 1024;
+		}
+		$f3->set("maxFileSize", $maxFileSize);
 		
 		echo Template::instance()->render("../views/base.tpl");
 	}
