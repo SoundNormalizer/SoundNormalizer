@@ -25,23 +25,25 @@ foreach ($unqueuedArr as $unqueued) {
 	$updateQueue = $db->prepare("UPDATE `conversions` SET `Started`=TRUE, `TimeStarted`=UNIX_TIMESTAMP() WHERE `ID`=:id");
 	$updateQueue->execute(array(":id" => $reqID));
 	
-	$statusCode = 0;	
-	$cmd = shell_exec($ytdlBin . " --extract-audio --prefer-ffmpeg --ffmpeg-location " . $ffmpegDir . " --audio-quality 128K --audio-format mp3 -o \"" . $outputDir . "/" . $reqLocalName . ".%(ext)s\" --add-metadata --sleep-interval 1 -- " . escapeshellarg($reqVideoID));
-	if (strpos($cmd, "YouTube said: This video does not exist") !== false) {
-		// Video is non-existent
-		$statusCode = 1;
-	}
-	elseif (strpos($cmd, "Unable to download webpage") !== false) {
-		// Couldn't fetch web page (bad video URL)
-		$statusCode = 2;
-	}
-	elseif (strpos($cmd, "Deleting original file") !== false) {
-		// Success
-		$statusCode = 3;
-	}
-	else {
-		// Unknown Error
-		$statusCode = 4;
+	$statusCode = 0;
+	if ($reqType == "youtube") {
+		$cmd = shell_exec($ytdlBin . " --extract-audio --prefer-ffmpeg --ffmpeg-location " . $ffmpegDir . " --audio-quality 128K --audio-format mp3 -o \"" . $outputDir . "/" . $reqLocalName . ".%(ext)s\" --add-metadata --sleep-interval 1 -- " . escapeshellarg($reqVideoID));
+		if (strpos($cmd, "YouTube said: This video does not exist") !== false) {
+			// Video is non-existent
+			$statusCode = 1;
+		}
+		elseif (strpos($cmd, "Unable to download webpage") !== false) {
+			// Couldn't fetch web page (bad video URL)
+			$statusCode = 2;
+		}
+		elseif (strpos($cmd, "Deleting original file") !== false) {
+			// Success
+			$statusCode = 3;
+		}
+		else {
+			// Unknown Error
+			$statusCode = 4;
+		}
 	}
 	
 	// Check if we should normalize it
