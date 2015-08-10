@@ -74,3 +74,17 @@ mp3gain
 ```
 sudo apt-get install mp3gain
 ```
+
+/etc/magic
+-----------
+
+Add these lines to the /etc/magic file
+
+```
+# MPEG Layer 3 sound files
+0       beshort     &0xffe0     audio/mpeg
+!:mime  audio/mpeg
+# MP3 with ID3 tag
+0       string      ID3     audio/mpeg
+!:mime  audio/mpeg
+```

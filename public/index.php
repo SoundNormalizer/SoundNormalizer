@@ -107,8 +107,13 @@ $f3->route("POST /upload",
 			$uploadName = $_FILES["file"]["name"];
 			
 			if ($fileError === UPLOAD_ERR_OK) {
-				$finfo = finfo_open(FILEINFO_MIME_TYPE);
-				$mimeType = finfo_file($finfo, $tmpName);
+				if (PHP_OS == "Linux") {
+					$mimeType = trim(shell_exec("file --mime-type -b " . escapeshellarg($tmpName)));
+				}	
+				else {
+					$finfo = finfo_open(FILEINFO_MIME_TYPE);
+					$mimeType = finfo_file($finfo, $tmpName);					
+				}
 				$fileExt = strtolower(pathinfo($uploadName, PATHINFO_EXTENSION));
 			
 				if (($mimeType != "audio/mpeg") || ($fileExt != "mp3")) {
