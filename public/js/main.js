@@ -1,6 +1,16 @@
 var selectedForm = "youtube";
 
 $(document).ready(function() {
+	// jquery toggle sets "inline" for upload-instructions, causing it to not center in @media, so we use this instead
+	$.fn.toggleBlock = function() {
+		if ($(this).css("display") == "none") {
+			$(this).css("display", "block");
+		}
+		else {
+			$(this).hide();
+		}
+	}
+
 	// register handlers to switch forms
 	$("#upload-switch").click(toggleForm);
 	$("#youtube-switch").click(toggleForm);
@@ -44,8 +54,8 @@ function toggleForm() {
 	$("#upload-form").toggle();
 	$("#youtube-switch").toggle();
 	$("#upload-switch").toggle();
-	$("#youtube-instructions").toggle();
-	$("#upload-instructions").toggle();
+	$("#youtube-instructions").toggleBlock();
+	$("#upload-instructions").toggleBlock();
 	
 	if (selectedForm == "youtube") {
 		selectedForm = "upload";

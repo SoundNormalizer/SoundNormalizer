@@ -7,7 +7,7 @@
 		<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
 		<link href="css/style.css" rel="stylesheet">
 		
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 		<check if="{{ @pageType == 'main' }}">
 			<true>
 				<script src="js/bootstrap.min.js"></script>
@@ -29,12 +29,7 @@
 	<div class="navbar navbar-default navbar-fixed-top">
 		<div class="container">
 			<div class="navbar-header">
-				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-				</button>
-				<a class="navbar-brand" href="./">{{ @siteName }}</a>
+				<a class="navbar-brand" href="./"><span class="glyphicon glyphicon-music brand-glyph"></span> &nbsp; {{ @siteName }}</a>
 			</div>
 		</div>
 	</div>
