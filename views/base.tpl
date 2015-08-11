@@ -1,7 +1,15 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>{{ @pageName }} | {{ @siteName }}</title>
+		<check if="{{ @pageType == 'main' }}">
+			<true>
+				<title>{{ @siteName }} - normalize MP3s online</title>
+				<meta name="description" content="The easiest way to normalize audio online, whether it is from YouTube or from your hard drive.">
+			</true>
+			<false>
+				<title>{{ @pageName }} - {{ @siteName }}</title>
+			</false>
+		</check>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="shortcut icon" href="favicon.ico">
 		<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
